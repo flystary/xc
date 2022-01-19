@@ -1,0 +1,85 @@
+#!/usr/bin/expect -f
+
+set node_ip  [lindex $argv 0]
+set cpe_ip   [lindex $argv 1]
+set username [lindex $argv 2]
+set password [lindex $argv 3]
+
+#set J_PWD qweasdRF123
+set O_PWD Onetworks.c0M
+set X_PWD Xnetworks.c0M
+
+set timeout 6
+spawn ssh $username@master.jump.7x-networks.net  -p 2222
+expect {
+    #如果有yes/no关键字
+    "yes/no" {
+    	#则输入yes
+        send "yes\n"
+        #输入yes后如果输出结果有"*assword:"关键字，则输入密码
+        expect "*assword:" { send "${password}\n" }
+    }
+    #如果上次输出结果有"*assword:"关键字，则输入密码
+    "*assword:" { send "${password}\n" }
+    timeout  {   send_error "User ${username} login timeout.\n";  exit 1;  }
+    # expect {
+    #     "*Opt>" {
+    #         send "g\n"
+    #     }
+
+    # }
+}
+
+expect "Opt>"
+send "g\r"
+expect "Opt>"
+send "${node_ip} \r"
+expect "*$"
+send "su -\r"
+
+expect {
+	#如果有yes/no关键字
+    "yes/no" {
+    	#则输入yes
+        send "yes\n"
+        #输入yes后如果输出结果有"*assword:"关键字，则输入密码
+        expect "*assword:" { send "${X_PWD}\n" }
+    }
+    #如果上次输出结果有"*assword:"关键字，则输入密码
+    "*assword:" { send "${X_PWD}\n" }
+    # timeout  {   send_error "User 'root' login timeout.\n";  exit 1;  }
+}
+
+expect "#"
+send "ssh -i /etc/openvpn/server/box seven@${cpe_ip}  -p 7722\r"
+expect {
+	#如果有yes/no关键字
+    "yes/no" {
+    	#则输入yes
+        send "yes\n"
+        #输入yes后如果输出结果有"*assword:"关键字，则输入密码
+        expect "key '/etc/openvpn/server/box':" { send "${O_PWD}\n" }
+    }
+    #如果上次输出结果有"*assword:"关键字，则输入密码
+    "key '/etc/openvpn/server/box':" { send "${O_PWD}\n" }
+    # timeout  {   send_error "User 'root' login timeout.\n";  exit 1;  }
+}
+expect "$"
+send "su -\r"
+expect {
+	#如果有yes/no关键字
+    "yes/no" {
+    	#则输入yes
+        send "yes\n"
+        #输入yes后如果输出结果有"*assword:"关键字，则输入密码
+        expect "*assword:" { send "${X_PWD}\n" }
+    }
+    #如果上次输出结果有"*assword:"关键字，则输入密码
+    "*assword:" { send "${X_PWD}\n" }
+    # timeout  {   send_error "User 'root' login timeout.\n";  exit 1;  }
+}
+send "7xcli_info|head -n 1\r"
+
+interact 
+# expect eof
+

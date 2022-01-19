@@ -1,0 +1,79 @@
+#!/usr/bin/python
+# encoding:utf-8
+
+import os
+import sys
+import json
+import collections
+from optparse import OptionParser 
+
+
+# # 获取命令参数
+parser = OptionParser()  
+parser.add_option("-f", "--file", dest="file",  
+                  help="write report to FILE", metavar="FILE",nargs=3)  
+options, _ = parser.parse_args() 
+
+# print(options.__dict__.get("file"))
+
+for file in options.__dict__.get("file"):
+    p , _ = file.strip().split('.')
+# 加载json配置文件
+    try:
+        oss_dict = json.load(open(file))
+    except:
+        sys.stderr.write("json加载失败\n")
+        sys.exit(1)
+
+    # 有序字典
+    oss_kv = {}
+    oss_kv = collections.OrderedDict() 
+
+
+    # print(oss_dict)
+    oss_dicts = []
+    for oss in oss_dict:
+        oss_kv = collections.OrderedDict() 
+        # print(oss)
+        try:
+            sn = oss["sn"]
+            model = oss["model"]
+            alias = oss["alias"]
+            master_entry_id = oss["masterEntryId"]
+            master_entry_ip = oss["masterEntryIp"]
+            backup_entry_id = oss["backupEntryId"]
+            backup_entry_ip = oss["backupEntryIp"]
+            software_version = oss["softwareVersion"]
+            # server_ip = oss["serverIp"]
+            
+        except:
+            success = False
+            sys.stderr.write("json解析错误！\n")
+        
+        if master_entry_id and backup_entry_id :
+            oss_kv['sn'] = sn
+            oss_kv['software_version'] = software_version
+            oss_kv['model'] = model
+            # oss_kv['alias'] = alias
+            oss_kv['master_entry_id'] = master_entry_id
+            oss_kv['master_entry_ip'] = master_entry_ip
+            oss_kv['backup_entry_id'] = backup_entry_id
+            oss_kv['backup_entry_ip'] = backup_entry_ip
+            
+            # oss_kv['server_ip'] = server_ip
+            # print(oss_kv)
+            oss_dicts.append(oss_kv)
+    # print(oss_dicts)  
+    #通用
+
+    path = "%s_kv.json" % p
+    os.remove(file)
+    with open (path, 'w') as f:
+        json.dump(oss_dicts, f)
+    print(path)
+sys.exit(0)
+
+
+
+
+
