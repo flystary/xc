@@ -1,4 +1,4 @@
-'''
+```bash
 # xc
 
 USAGE:
@@ -44,4 +44,4 @@ OPTIONS:
 
 ARGS:
     <sn>    cpe serial number
-'''
+```
