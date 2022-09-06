@@ -1,35 +1,30 @@
 #[macro_use]
-#[warn(unreachable_code)]
+// #[warn(unreachable_code)]
 extern crate clap;
-// extern crate data_encoding;
-use clap::App;
-mod cli;
+mod conf;
 mod cmd;
+mod utils;
+use clap::App;
 
 
-fn main() {
+fn run() {
     let matches = App::new(crate_name!())
         .author("flyZer0 <flyoney@163.com>")
         .about(crate_description!())
         .version(crate_version!())
-        .subcommand(cli::net::subcommand())
-        .subcommand(cli::show::subcommand())
-        .subcommand(cli::connet::subcommand())
-        .subcommand(cmd::add::subcommand())
-        // .subcommand(cmd::view::subcommand())
-        // .subcommand(cmd::list::subcommand())
-        .subcommand(cmd::delete::subcommand())
+        .subcommand(cmd::connet::subcommand())
+        .subcommand(cmd::show::subcommand())
+        .subcommand(cmd::update::subcommand())
         .get_matches();
-
     match matches.subcommand() {
-        //cli
-        ("net", Some(box_m)) => cli::net::run(box_m),
-        ("show", Some(box_m)) => cli::show::run(box_m),
-        ("connet", Some(box_m)) => cli::connet::run(box_m),
         //cmd
-        ("add", Some(sub_m)) => cmd::add::run(sub_m),
-        ("delete", Some(sub_m)) => cmd::delete::run(sub_m),
-        _ => eprintln!("No subcommand chosen. add --help | -h to view the subcommands."),
+        ("connet", Some(box_m)) => cmd::connet::run(box_m),
+        ("show",   Some(box_m)) => cmd::show::run(box_m),
+        ("update", Some(box_m)) => cmd::update::run(box_m),
+        _ => eprintln!("No subcommand chosen. use --help | -h to view the subcommands."),
     }
 }
-//#[warn(unreachable_code)]
+
+fn main() {
+    run()
+}

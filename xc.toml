@@ -1,3 +1,6 @@
 [user]
-username = "qsasaq"
-password = "asasa"
+username = ""
+password = ""
+
+[url]
+path = "/etc/xc/xc.rules"
