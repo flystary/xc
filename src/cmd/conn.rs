@@ -12,10 +12,10 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .help("cpe serial number"),
         )
         .arg(
-            Arg::with_name("connmode")
+            Arg::with_name("conn-mode")
                 .required(false)
                 .short("c")
-                // .long("mode")
+                .long("conn-mode")
                 .takes_value(true)
                 .possible_values(&["ssh", "telnet", "crt", "xshell"])
                 // .value_name("Connet Mode")
