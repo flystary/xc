@@ -3,7 +3,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 use futures::executor::block_on;
 use crate::conf::yaml::{
-    Url, 
+    Url,
     load_url,
 };
 use crate::conf::toml::{
@@ -54,7 +54,7 @@ async fn get_token_by_resp() -> Option<String> {
             if let Some(token) = v.get("access_token") {
                 if let Value::String(token) = token {
                     return Some(token.to_string());
-                }  
+                }
             }
         },
         Err(e) => {
@@ -113,7 +113,7 @@ pub async fn get_devices(base: String) -> String{
 
 pub fn get_cpe(mode: &str, sn: &str) ->Option<Value> {
     if let Some(base) = get_cpe_url_by_mode(mode) {
-        let text = block_on(get_cpes(base)); 
+        let text = block_on(get_cpes(base));
         let v: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
         for cpe in v {
             if cpe["sn"] == *sn {
@@ -127,7 +127,7 @@ pub fn get_cpe(mode: &str, sn: &str) ->Option<Value> {
 
 pub fn get_pop(mode: &str, id: i64) ->Option<Value> {
     if let Some(base) = get_pop_url_by_mode(mode) {
-        let text = block_on(get_pops(base)); 
+        let text = block_on(get_pops(base));
         let v: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
         for pop in v {
             if pop["id"] == id {
@@ -186,7 +186,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
     let mut version = String::new();
     let mut cpeport = String::new();
     let mut synctime = String::new();
-    
+
     let mut master_pop_ip = String::new();
     let mut master_cpe_ip = String::new();
     let mut backup_pop_ip = String::new();
@@ -217,7 +217,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                 }
                 if let Value::Number(id) = &s["backupEntryId"] {
                     bid = id.as_i64().unwrap();
-                }  
+                }
             }
             if let Some(d) = get_device(mode, sn) {
                 if let Value::Number(p) = &d["serverPort"] {
@@ -260,7 +260,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                 }
                 if let Value::Number(id) = &s["backupEntryId"] {
                     bid = id.as_i64().unwrap();
-                }  
+                }
             }
             if let Some(d) = get_device(mode, sn) {
                 if let Value::Number(p) = &d["serverPort"] {
@@ -303,7 +303,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                 }
                 if let Value::Number(id) = &s["backupEntryId"] {
                     bid = id.as_i64().unwrap();
-                }  
+                }
             }
             if let Some(d) = get_device(mode, sn) {
                 if let Value::Number(p) = &d["serverPort"] {
@@ -346,7 +346,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                 }
                 if let Value::Number(id) = &s["backupPopId"] {
                     bid = id.as_i64().unwrap();
-                }  
+                }
             }
             if let Some(d) = get_device(mode, sn) {
                 if let Value::Number(p) = &d["serverPort"] {
@@ -389,7 +389,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                 }
                 if let Value::Number(id) = &s["backupPopId"] {
                     bid = id.as_i64().unwrap();
-                }  
+                }
             }
             if let Some(d) = get_device(mode, sn) {
                 if let Value::Number(p) = &d["serverPort"] {

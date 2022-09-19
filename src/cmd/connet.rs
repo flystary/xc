@@ -30,7 +30,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .possible_values(&["nexus","valor", "watsons", "watsons_ha", "tassadar"])
                 // .value_name("Connet Mode")
                 .help("Use connet to business the CPE,the default version is nexus."),
-        )    
+        )
 }
 
 pub fn run(args: &ArgMatches) {
@@ -51,7 +51,7 @@ pub fn run(args: &ArgMatches) {
     }
     println!("Use remote CPE mode is: {}", connet.blue().bold());
     cpe.show();
-    
+
     let mut input = String::new();
     println!("Please select {} or {} login CPE :\t", "Master".blue().bold(), "Backup".blue().bold());
     println!("\t1) Please select {} use Master entry login CPE.\t", "a".green().bold());
@@ -60,7 +60,7 @@ pub fn run(args: &ArgMatches) {
     println!("\t4) Please select {} or {} Exit terminal.\t","q".red().bold(),"exit".red().bold());
 
     let _bytes = std::io::stdin().read_line(&mut input).unwrap();
-    
+
     match input.trim() {
         "A" => {
             cpe.connet_master()

@@ -3,7 +3,7 @@ use serde_json::value::Value;
 use std::collections::HashMap;
 use futures::executor::block_on;
 use crate::conf::url::{
-    Url, 
+    Url,
     load_url,
 };
 use crate::conf::conf::{
@@ -66,7 +66,7 @@ async fn get_token_by_resp() -> String {
         Err(e) => println!("Error is {}", e),
     };
     return s;
-    
+
 }
 
 pub async fn get_pops(base: String) -> String {
@@ -97,7 +97,7 @@ pub fn get_cpe(mode: String, sn: String) -> Option<Sixc> {
     match mode.clone().as_str() {
         "nexus" => {
             if let Some(base) = get_cpe_url_by_mode(mode) {
-                let text = block_on(get_cpes(base)); 
+                let text = block_on(get_cpes(base));
                 let v: Vec<Sixc> = serde_json::from_str(text.as_str()).unwrap();
                 for sixc in v.iter() {
                     if sixc.sn == sn {
@@ -109,7 +109,7 @@ pub fn get_cpe(mode: String, sn: String) -> Option<Sixc> {
         },
         "watsons" => {
             if let Some(base) = get_cpe_url_by_mode(mode) {
-                let text = block_on(get_cpes(base)); 
+                let text = block_on(get_cpes(base));
                 let v: Vec<Sixc> = serde_json::from_str(text.as_str()).unwrap();
                 for sixc in v.iter() {
                     if sixc.sn == sn {
@@ -121,7 +121,7 @@ pub fn get_cpe(mode: String, sn: String) -> Option<Sixc> {
         },
         "watsons_ha" => {
             if let Some(base) = get_cpe_url_by_mode(mode) {
-                let text = block_on(get_cpes(base)); 
+                let text = block_on(get_cpes(base));
                 let v: Vec<Sixc> = serde_json::from_str(text.as_str()).unwrap();
                 for sixc in v.iter() {
                     if sixc.sn == sn {
@@ -133,7 +133,7 @@ pub fn get_cpe(mode: String, sn: String) -> Option<Sixc> {
         },
         "valor" => {
             // if let Some(base) = get_cpe_url_by_mode(mode) {
-            //     let text = get_cpes(base).await; 
+            //     let text = get_cpes(base).await;
             //     let v: Vec<Cpe> = serde_json::from_str(text.as_str()).unwrap();
             //     for cpe in v.iter() {
             //         if cpe.sn == sn {
@@ -146,7 +146,7 @@ pub fn get_cpe(mode: String, sn: String) -> Option<Sixc> {
         },
         "tassadar" => {
             // if let Some(base) = get_cpe_url_by_mode(mode) {
-            //     let text = get_cpes(base).await; 
+            //     let text = get_cpes(base).await;
             //     let v: Vec<Cpe> = serde_json::from_str(text.as_str()).unwrap();
             //     for cpe in v.iter() {
             //         if cpe.sn == sn {
@@ -157,12 +157,12 @@ pub fn get_cpe(mode: String, sn: String) -> Option<Sixc> {
             // }
             // return None;
         },
-        
+
         &_ => {
             return None;
         }
     };
-    
+
     None
 }
 
@@ -171,7 +171,7 @@ pub fn get_pop(mode: String, id: i64) -> Option<Sixp> {
     match mode.clone().as_str() {
         "nexus" => {
             if let Some(base) = get_pop_url_by_mode(mode) {
-                let text = block_on(get_pops(base)); 
+                let text = block_on(get_pops(base));
                 let v: Vec<Sixp> = serde_json::from_str(text.as_str()).unwrap();
                 for sixp in v.iter() {
                     if sixp.id == id {
@@ -195,7 +195,7 @@ pub fn get_pop(mode: String, id: i64) -> Option<Sixp> {
         },
         "watsons_ha" => {
             if let Some(base) = get_pop_url_by_mode(mode) {
-                let text = block_on(get_pops(base));  
+                let text = block_on(get_pops(base));
                 let v: Vec<Sixp> = serde_json::from_str(text.as_str()).unwrap();
                 for sixp in v.iter() {
                     if sixp.id == id {
@@ -207,7 +207,7 @@ pub fn get_pop(mode: String, id: i64) -> Option<Sixp> {
         },
         "valor" => {
             // if let Some(base) = get_pop_url_by_mode(mode) {
-            //     let text = block_on(get_pops(base)); 
+            //     let text = block_on(get_pops(base));
             //     let v: Vec<Pop> = serde_json::from_str(text.as_str()).unwrap();
             //     for pop in v.iter() {
             //         if pop.id == id {
@@ -219,7 +219,7 @@ pub fn get_pop(mode: String, id: i64) -> Option<Sixp> {
         },
         "tassadar" => {
             // if let Some(base) = get_pop_url_by_mode(mode) {
-            //     let text = block_on(get_pops(base)); 
+            //     let text = block_on(get_pops(base));
             //     let v: Vec<Sase> = serde_json::from_str(text.as_str()).unwrap();
             //     for sasep in v.iter() {
             //         if sasep.id == id {

@@ -96,7 +96,6 @@ impl Cpe {
                 .arg(conf.user.password)
                 // .arg(format!("{}@{}", user_name, ip_name))
                 .status()
-                .expect("登录失败!");  
+                .expect("登录失败!");
     }
 }
-
