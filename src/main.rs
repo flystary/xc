@@ -12,15 +12,15 @@ fn run() {
         .author("flyZer0 <flyoney@163.com>")
         .about(crate_description!())
         .version(crate_version!())
-        .subcommand(cmd::connet::subcommand())
+        .subcommand(cmd::conn::subcommand())
         .subcommand(cmd::show::subcommand())
         .subcommand(cmd::update::subcommand())
         .get_matches();
     match matches.subcommand() {
         //cmd
-        ("connet", Some(box_m)) => cmd::connet::run(box_m),
-        ("show",   Some(box_m)) => cmd::show::run(box_m),
-        ("update", Some(box_m)) => cmd::update::run(box_m),
+        ("conn", Some(ucpe)) => cmd::conn::run(ucpe),
+        ("show", Some(ucpe)) => cmd::show::run(ucpe),
+        ("update", Some(ucpe)) => cmd::update::run(ucpe),
         _ => eprintln!("No subcommand chosen. use --help | -h to view the subcommands."),
     }
 }

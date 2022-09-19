@@ -4,7 +4,7 @@ use crate::utils::net::get_cpe_by_sn_and_mode;
 use colored::*;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
-    SubCommand::with_name("connet")
+    SubCommand::with_name("conn")
         .about("Connect can be used to remotely connect CPE and display the process on the terminal.")
         .arg(
             Arg::with_name("sn")
@@ -12,7 +12,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .help("cpe serial number"),
         )
         .arg(
-            Arg::with_name("connetmode")
+            Arg::with_name("connmode")
                 .required(false)
                 .short("c")
                 // .long("mode")
@@ -25,7 +25,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
             Arg::with_name("mode")
                 .required(false)
                 .short("m")
-                // .long("mode")
+                .long("mode")
                 .takes_value(true)
                 .possible_values(&["nexus","valor", "watsons", "watsons_ha", "tassadar"])
                 // .value_name("Connet Mode")
@@ -35,7 +35,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
 
 pub fn run(args: &ArgMatches) {
     let sn = args.value_of("sn").unwrap();
-    let connet: &str = match args.value_of("connetmode") {
+    let conn: &str = match args.value_of("connmode") {
         Some(m) => m,
         None    => "ssh",
     };
@@ -49,7 +49,7 @@ pub fn run(args: &ArgMatches) {
         println!("{}","Use CPE mode is Error.".red());
         return;
     }
-    println!("Use remote CPE mode is: {}", connet.blue().bold());
+    println!("Use remote CPE mode is: {}", conn.blue().bold());
     cpe.show();
 
     let mut input = String::new();
@@ -63,27 +63,27 @@ pub fn run(args: &ArgMatches) {
 
     match input.trim() {
         "A" => {
-            cpe.connet_master()
+            cpe.conn_master()
         }
         "a" => {
-            cpe.connet_master()
+            cpe.conn_master()
         }
         "B" => {
-            cpe.connet_backup()
+            cpe.conn_backup()
         }
         "b" => {
-            cpe.connet_backup()
+            cpe.conn_backup()
         }
         "C" => {
-            cpe.connet_backup()
+            cpe.conn_backup()
         }
         "c" => {
-            cpe.connet_backup()
+            cpe.conn_backup()
         }
         "q" => {}
         "exit" => {}
         "" => {
-            cpe.connet_master()
+            cpe.conn_master()
         }
         _ => {
             println!("{}","Input Error.".red().bold());

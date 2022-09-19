@@ -50,7 +50,7 @@ impl Cpe {
         }
         true
     }
-    pub fn connet_master(&self) {
+    pub fn conn_master(&self) {
         let conf = init_toml();
         if self.master_cpe_ip.as_str() == "0.0.0.0" || self.master_pop_ip.as_str() == "0.0.0.0" {
             println!("{}", "CPE Master pop or cpe is 0.0.0.0".red().bold());
@@ -74,7 +74,7 @@ impl Cpe {
                 .status()
                 .expect("登录失败!");
     }
-    pub fn connet_backup(&self) {
+    pub fn conn_backup(&self) {
         let conf = init_toml();
         if self.backup_cpe_ip.as_str() == "0.0.0.0" || self.backup_pop_ip.as_str() == "0.0.0.0" {
             println!("{}", "CPE Backup pop or cpe is 0.0.0.0".red().bold());

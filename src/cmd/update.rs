@@ -16,13 +16,13 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
             Arg::with_name("mode")
                 .required(false)
                 .short("m")
-                // .long("mode")
+                .long("mode")
                 .takes_value(true)
                 .possible_values(&["nexus","valor", "watsons", "watsons_ha", "tassadar"])
                 // .value_name("Connet Mode")
                 .help("Use this option to select the CPE of the specified version, otherwise the default version is nexus"),
         )
-        
+
 }
 
 
@@ -34,5 +34,5 @@ pub fn run(args: &ArgMatches) {
         Some(m) => m,
         None    => "nexus",
     };
-    println!("此功能暂不支持 {} {}", mode, sn); 
+    println!("此功能暂不支持 {} {}", mode, sn);
 }

@@ -1,3 +1,4 @@
 pub mod show;
-pub mod connet;
+pub mod list;
+pub mod conn;
 pub mod update;

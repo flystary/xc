@@ -15,7 +15,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
             Arg::with_name("mode")
                 .required(false)
                 .short("m")
-                // .long("mode")
+                .long("mode")
                 .takes_value(true)
                 .possible_values(&["nexus","valor", "watsons", "watsons_ha", "tassadar"])
                 // .value_name("Connet Mode")
