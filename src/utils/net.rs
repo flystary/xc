@@ -22,7 +22,7 @@ pub fn init_toml() -> Conf {
 }
 
 pub fn init_yaml() -> Url {
-    load_url(init_toml().sys.rulepath)
+    load_url(init_toml().sys.path)
 }
 
 pub fn get_unixtime() -> i64 {
@@ -37,15 +37,14 @@ pub fn md5<S:Into<String>>(input: S) -> String {
 }
 
 async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::Error> {
+    let sys = init_toml().sys;
     let client = reqwest::blocking::Client::new();
     let url = format!(
-        "{}/matrix/oauth/token?client_id={}&client_secret={}&grant_type={}&password={}&username={}",
-        CLENT_HOST = String::from("http://xxxx.xxx"),
-        CLIENT_ID = String::from("browser"),
-        CLIENT_SECRET = String::from("b7n3i7kzg22y3p035rw3rd9sfzvs4cv0"),
-        GRANT_TYPE = String::from("password"),
-        PASSWORD = String::from("c8d064e2ad4670f418ba02ef342b33d1"),
-        USERNAME = String::from("matrix")
+        "{}/matrix/oauth/token?client_id=browser&client_secret={}&grant_type=password&password={}&username={}",
+        sys.loginurl,
+        sys.secret,
+        md5(md5(sys.password)),
+        sys.username
     );
 
     client
@@ -383,7 +382,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                 if let Value::String(v) = &s["softwareVersion"] {
                     version = v.to_string();
                 }
-                if let Value::String(t) = &s["entryUpdateTime"] {
+                if let Value::String(t) = &s["popUpdateTime"] {
                     synctime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterPopIp"] {

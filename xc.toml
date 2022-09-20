@@ -1,6 +1,6 @@
-
 [sys]
-rulepath = "/etc/xc/xc.rules"
+path = "/etc/xc/xc.rules"
+secret = ""
 loginurl = ""
 username = ""
 password = ""

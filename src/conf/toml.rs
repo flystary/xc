@@ -12,7 +12,8 @@ pub struct Jump {
 
 #[derive(Debug, Deserialize)]
 pub struct Sys {
-    pub rulepath: String,
+    pub path: String,
+    pub secret: String,
     pub loginurl: String,
     pub username: String,
     pub password: String
