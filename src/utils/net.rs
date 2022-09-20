@@ -32,7 +32,7 @@ async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::E
     let client = reqwest::blocking::Client::new();
     let url = format!(
         "{}/matrix/oauth/token?client_id={}&client_secret={}&grant_type={}&password={}&username={}",
-        CLENT_HOST = String::from("http://internal.oss.7x-networks.net"),
+        CLENT_HOST = String::from("http://xxxx.xxx"),
         CLIENT_ID = String::from("browser"),
         CLIENT_SECRET = String::from("b7n3i7kzg22y3p035rw3rd9sfzvs4cv0"),
         GRANT_TYPE = String::from("password"),
