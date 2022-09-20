@@ -1,6 +1,10 @@
-[user]
+
+[sys]
+rulepath = "/etc/xc/xc.rules"
+loginurl = ""
 username = ""
 password = ""
 
-[url]
-path = "/etc/xc/xc.rules"
+[jump]
+username = ""
+password = ""

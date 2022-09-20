@@ -20,7 +20,7 @@ pub fn init_toml() -> Conf {
 }
 
 pub fn init_yaml() -> Url {
-    load_url(init_toml().url.path)
+    load_url(init_toml().sys.rulepath)
 }
 
 pub fn get_unixtime() -> i64 {

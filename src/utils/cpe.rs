@@ -60,7 +60,7 @@ impl Cpe {
             println!("{}", "CPE Master pop or cpe is None".red().bold());
             return
         }
-        if conf.user.username.is_empty() || conf.user.password.is_empty() {
+        if conf.jump.username.is_empty() || conf.jump.password.is_empty() {
             println!("{}", "LOGIN CPE Username or password is None".red().bold());
             return
         }
@@ -68,8 +68,8 @@ impl Cpe {
                 .arg("/etc/xc/bin/connet")
                 .arg(&self.master_pop_ip)
                 .arg(&self.master_cpe_ip)
-                .arg(conf.user.username)
-                .arg(conf.user.password)
+                .arg(conf.jump.username)
+                .arg(conf.jump.password)
                 // .arg(format!("{}@{}", user_name, ip_name))
                 .status()
                 .expect("登录失败!");
@@ -84,7 +84,7 @@ impl Cpe {
             println!("{}", "CPE Backup pop or cpe is None".red().bold());
             return
         }
-        if conf.user.username.is_empty() || conf.user.password.is_empty() {
+        if conf.jump.username.is_empty() || conf.jump.password.is_empty() {
             println!("{}", "LOGIN CPE Username or password is None".red().bold());
             return
         }
@@ -92,8 +92,8 @@ impl Cpe {
                 .arg("/etc/xc/bin/connet")
                 .arg(&self.backup_pop_ip)
                 .arg(&self.backup_cpe_ip)
-                .arg(conf.user.username)
-                .arg(conf.user.password)
+                .arg(conf.jump.username)
+                .arg(conf.jump.password)
                 // .arg(format!("{}@{}", user_name, ip_name))
                 .status()
                 .expect("登录失败!");
