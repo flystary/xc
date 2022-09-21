@@ -19,14 +19,14 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .takes_value(true)
                 .possible_values(&["nexus","valor", "watsons", "watsons_ha", "tassadar"])
                 // .value_name("Connet Mode")
-                .help("Use show to select the CPE, the default version is nexus."),
+                .help("Use show to select the CPE, the default version is valor."),
         )
 }
 pub fn run(args: &ArgMatches) {
     let sn = args.value_of("sn").unwrap();
     let mode: &str = match args.value_of("mode") {
         Some(m) => m,
-        None    => "nexus",
+        None    => "valor",
     };
     let cpe = get_cpe_by_sn_and_mode(sn, mode);
     if !cpe.check_master() && !cpe.check_backup() {
