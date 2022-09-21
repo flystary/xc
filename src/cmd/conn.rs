@@ -11,16 +11,16 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .required(true)
                 .help("cpe serial number"),
         )
-        .arg(
-            Arg::with_name("conn-mode")
-                .required(false)
-                .short("c")
-                .long("conn-mode")
-                .takes_value(true)
-                .possible_values(&["ssh", "telnet", "crt", "xshell"])
+        //.arg(
+            //Arg::with_name("remode")
+                //.required(false)
+                //.short("c")
+                //.long("conn-mode")
+                //.takes_value(true)
+                //.possible_values(&["ssh", "telnet", "crt", "xshell"])
                 // .value_name("Connet Mode")
-                .help("Use this option to select the remote CPE mode. Otherwise, the default version is SSH."),
-        )
+                //.help("Use this option to select the remote CPE mode. Otherwise, the default version is SSH."),
+        //)
         .arg(
             Arg::with_name("mode")
                 .required(false)
@@ -29,27 +29,27 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .takes_value(true)
                 .possible_values(&["nexus","valor", "watsons", "watsons_ha", "tassadar"])
                 // .value_name("Connet Mode")
-                .help("Use connet to business the CPE,the default version is nexus."),
+                .help("Use connet to business the CPE,the default version is valor."),
         )
 }
 
 pub fn run(args: &ArgMatches) {
     let sn = args.value_of("sn").unwrap();
-    let conn: &str = match args.value_of("connmode") {
-        Some(m) => m,
-        None    => "ssh",
-    };
+    //let conn: &str = match args.value_of("connmode") {
+    //    Some(m) => m,
+    //    None    => "ssh",
+    //};
 
     let mode: &str = match args.value_of("mode") {
         Some(m) => m,
-        None    => "nexus",
+        None    => "valor",
     };
     let cpe = get_cpe_by_sn_and_mode(sn, mode);
     if !cpe.check_master() && !cpe.check_backup() {
         println!("{}","Use CPE mode is Error.".red());
         return;
     }
-    println!("Use remote CPE mode is: {}", conn.blue().bold());
+    //println!("Use remote CPE mode is: {}", conn.blue().bold());
     cpe.show();
 
     let mut input = String::new();
