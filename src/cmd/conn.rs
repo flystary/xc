@@ -27,9 +27,15 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .short("m")
                 .long("mode")
                 .takes_value(true)
-                .possible_values(&["nexus","valor", "watsons", "watsons_ha", "tassadar"])
-                // .value_name("Connet Mode")
-                .help("Use connet to business the CPE,the default version is valor."),
+                .possible_value("valor")
+                .possible_value("nexus")
+                .possible_value("watsons")
+                .possible_value("tassadar")
+                .possible_value("watsons_ha")
+                .multiple(true)
+                .case_insensitive(true)
+                .value_name("Mode")
+                //.help("Use connet to business the CPE,the default version is valor."),
         )
 }
 

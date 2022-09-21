@@ -6,7 +6,6 @@ mod cmd;
 mod utils;
 use clap::App;
 
-
 fn run() {
     let matches = App::new(crate_name!())
         .author("flyZer0 <flyoney@163.com>")

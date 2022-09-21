@@ -194,10 +194,10 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
     let mut cpeport = String::new();
     let mut synctime = String::new();
 
-    let mut master_pop_ip = String::new();
-    let mut master_cpe_ip = String::new();
-    let mut backup_pop_ip = String::new();
-    let mut backup_cpe_ip = String::new();
+    let mut masterpopip = String::new();
+    let mut mastercpeip = String::new();
+    let mut backuppopip = String::new();
+    let mut backupcpeip = String::new();
     match mode {
         "nexus"    => {
             if let Some(s) = get_cpe(mode, sn) {
@@ -214,10 +214,10 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                     synctime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterEntryIp"] {
-                    master_cpe_ip = m.to_string();
+                    mastercpeip = m.to_string();
                 }
                 if let Value::String(b) = &s["backupEntryIp"] {
-                    backup_cpe_ip = b.to_string();
+                    backupcpeip = b.to_string();
                 }
                 if let Value::Number(id) =  &s["masterEntryId"] {
                     mid = id.as_i64().unwrap();
@@ -233,12 +233,12 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
             }
             if let Some(p) = get_pop(mode, mid) {
                 if let Value::String(m) = &p["entryIp"] {
-                    master_pop_ip = m.to_string();
+                    masterpopip = m.to_string();
               }
             }
             if let Some(p) = get_pop(mode, bid) {
                 if let Value::String(b) = &p["entryIp"] {
-                    backup_pop_ip = b.to_string();
+                    backuppopip = b.to_string();
               }
             }
         },
@@ -257,10 +257,10 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                     synctime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterEntryIp"] {
-                    master_cpe_ip = m.to_string();
+                    mastercpeip = m.to_string();
                 }
                 if let Value::String(b) = &s["backupEntryIp"] {
-                    backup_cpe_ip = b.to_string();
+                    backupcpeip = b.to_string();
                 }
                 if let Value::Number(id) = &s["masterEntryId"] {
                     mid = id.as_i64().unwrap();
@@ -276,12 +276,12 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
             }
             if let Some(p) = get_pop(mode, mid) {
                 if let Value::String(m) = &p["entryIp"] {
-                    master_pop_ip = m.to_string();
+                    masterpopip = m.to_string();
               }
             }
             if let Some(p) = get_pop(mode, bid) {
                 if let Value::String(b) = &p["entryIp"] {
-                    backup_pop_ip = b.to_string();
+                    backuppopip = b.to_string();
               }
             }
         },
@@ -300,10 +300,10 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                     synctime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterEntryIp"] {
-                    master_cpe_ip = m.to_string();
+                    mastercpeip = m.to_string();
                 }
                 if let Value::String(b) = &s["backupEntryIp"] {
-                    backup_cpe_ip = b.to_string();
+                    backupcpeip = b.to_string();
                 }
                 if let Value::Number(id) =  &s["masterEntryId"] {
                     mid = id.as_i64().unwrap();
@@ -319,12 +319,12 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
             }
             if let Some(p) = get_pop(mode, mid) {
                 if let Value::String(m) = &p["entryIp"] {
-                    master_pop_ip = m.to_string();
+                    masterpopip = m.to_string();
               }
             }
             if let Some(p) = get_pop(mode, bid) {
                 if let Value::String(b) = &p["entryIp"] {
-                    backup_pop_ip = b.to_string();
+                    backuppopip = b.to_string();
               }
             }
         },
@@ -343,10 +343,10 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                     synctime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterPopIp"] {
-                    master_cpe_ip = m.to_string();
+                    mastercpeip = m.to_string();
                 }
                 if let Value::String(b) = &s["backupPopIp"] {
-                    backup_cpe_ip = b.to_string();
+                    backupcpeip = b.to_string();
                 }
                 if let Value::Number(id) =  &s["masterPopId"] {
                     mid = id.as_i64().unwrap();
@@ -362,12 +362,12 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
             }
             if let Some(p) = get_pop(mode, mid) {
                 if let Value::String(m) = &p["popIp"]{
-                    master_pop_ip = m.to_string();
+                    masterpopip = m.to_string();
               }
             }
             if let Some(p) = get_pop(mode, bid) {
                 if let Value::String(b) = &p["popIp"] {
-                    backup_pop_ip = b.to_string();
+                    backuppopip = b.to_string();
               }
             }
         },
@@ -386,10 +386,10 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                     synctime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterPopIp"] {
-                    master_cpe_ip = m.to_string();
+                    mastercpeip = m.to_string();
                 }
                 if let Value::String(b) = &s["backupPopIp"] {
-                    backup_cpe_ip = b.to_string();
+                    backupcpeip = b.to_string();
                 }
                 if let Value::Number(id) = &s["masterPopId"] {
                     mid = id.as_i64().unwrap();
@@ -405,12 +405,12 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
             }
             if let Some(p) = get_pop(mode, mid) {
                 if let Value::String(m) = &p["entryIp"] {
-                    master_pop_ip = m.to_string();
+                    masterpopip = m.to_string();
               }
             }
             if let Some(p) = get_pop(mode, bid) {
                 if let Value::String(b) = &p["entryIp"] {
-                    backup_pop_ip = b.to_string();
+                    backuppopip = b.to_string();
               }
             }
         },
@@ -418,5 +418,5 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
             println!("Unknown mode: {}", mode);
         }
     }
-   Cpe::new(cpesn, model, version, synctime, cpeport, master_pop_ip, master_cpe_ip, backup_pop_ip, backup_cpe_ip)
+   Cpe::new(cpesn, model, version, cpeport, synctime, masterpopip, mastercpeip, backuppopip, backupcpeip)
 }

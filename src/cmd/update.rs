@@ -5,20 +5,28 @@ extern crate tabled;
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("update")
         .about("Use update to update local CPE information")
+
         .arg(
             Arg::with_name("sn")
                 .required(true)
                 .help("cpe serial number"),
         )
+
         .arg(
             Arg::with_name("mode")
                 .required(false)
                 .short("m")
                 .long("mode")
                 .takes_value(true)
-                .possible_values(&["nexus","valor", "watsons", "watsons_ha", "tassadar"])
-                // .value_name("Connet Mode")
-                .help("Use this option to select the CPE of the specified version, otherwise the default version is valor"),
+                .possible_value("valor")
+                .possible_value("nexus")
+                .possible_value("watsons")
+                .possible_value("tassadar")
+                .possible_value("watsons_ha")
+                .multiple(true)
+                .case_insensitive(true)
+                .value_name("Mode")
+                //.help("Use show to select the CPE, the default version is valor."),
         )
 }
 
