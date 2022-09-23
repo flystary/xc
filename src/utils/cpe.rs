@@ -16,7 +16,7 @@ pub struct Cpe {
     model: String,
     version: String,
     //cpeport: String,
-    updatetime:    String,
+    updatetime:  String,
     masterpopip: String,
     mastercpeip: String,
     backuppopip: String,
@@ -66,15 +66,16 @@ impl Cpe {
             println!("{}", "LOGIN CPE Username or password is None".red().bold());
             return
         }
-        Command::new("/usr/bin/expect")
-                .arg("/etc/xc/bin/connet")
-                .arg(&self.masterpopip)
-                .arg(&self.mastercpeip)
-                .arg(conf.jump.username)
-                .arg(conf.jump.password)
-                // .arg(format!("{}@{}", user_name, ip_name))
-                .status()
-                .expect("登录失败!");
+        let _output = if cfg!(target_os = "linux") {
+            Command::new("/usr/bin/expect")
+                    .arg("/etc/xc/bin/connet")
+                    .arg(&self.masterpopip)
+                    .arg(&self.mastercpeip)
+                    .arg(conf.jump.username)
+                    .arg(conf.jump.password)
+                    .status()
+                    .expect("登录失败!");
+        };
     }
     pub fn conn_backup(&self) {
         let conf = init_toml();
