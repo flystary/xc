@@ -192,8 +192,8 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
     let mut model = String::new();
     let mut version = String::new();
     let mut cpeport = String::new();
-    let mut synctime = String::new();
 
+    let mut updatetime  = String::new();
     let mut masterpopip = String::new();
     let mut mastercpeip = String::new();
     let mut backuppopip = String::new();
@@ -211,7 +211,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                     version = v.to_string();
                 }
                 if let Value::String(t) = &s["entryUpdateTime"] {
-                    synctime = t.to_string();
+                    updatetime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterEntryIp"] {
                     mastercpeip = m.to_string();
@@ -254,7 +254,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                     version = v.to_string();
                 }
                 if let Value::String(t) = &s["entryUpdateTime"] {
-                    synctime = t.to_string();
+                    updatetime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterEntryIp"] {
                     mastercpeip = m.to_string();
@@ -297,7 +297,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                     version = v.to_string();
                 }
                 if let Value::String(t) = &s["entryUpdateTime"] {
-                    synctime = t.to_string();
+                    updatetime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterEntryIp"] {
                     mastercpeip = m.to_string();
@@ -340,7 +340,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                     version = v.to_string();
                 }
                 if let Value::String(t) = &s["entryUpdateTime"] {
-                    synctime = t.to_string();
+                    updatetime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterPopIp"] {
                     mastercpeip = m.to_string();
@@ -383,7 +383,7 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
                     version = v.to_string();
                 }
                 if let Value::String(t) = &s["popUpdateTime"] {
-                    synctime = t.to_string();
+                    updatetime = t.to_string();
                 }
                 if let Value::String(m) = &s["masterPopIp"] {
                     mastercpeip = m.to_string();
@@ -418,5 +418,5 @@ pub fn get_cpe_by_sn_and_mode(sn: &str, mode: &str) -> Cpe {
             println!("Unknown mode: {}", mode);
         }
     }
-   Cpe::new(cpesn, model, version, cpeport, synctime, masterpopip, mastercpeip, backuppopip, backupcpeip)
+   Cpe::new(cpesn, model, version, cpeport, updatetime, masterpopip, mastercpeip, backuppopip, backupcpeip)
 }

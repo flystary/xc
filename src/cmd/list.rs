@@ -38,7 +38,9 @@ pub fn run(args: &ArgMatches) {
     let cpe = get_cpe_by_sn_and_mode(sn, mode);
     if !cpe.check_master() && !cpe.check_backup() {
         println!("{}","Use CPE mode is Error.".red());
-        return;
+        return
     }
+    //println!("CPE mode is: {}", mode.blue().bold());
+    println!("CPE {} is: {}","Mode".blue().bold(),mode.bold());
     cpe.show();
 }

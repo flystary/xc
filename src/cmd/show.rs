@@ -40,5 +40,6 @@ pub fn run(args: &ArgMatches) {
         println!("{}","Use CPE mode is Error.".red());
         return;
     }
+    println!("CPE {} is: {}","Mode".blue().bold(),mode.bold());
     cpe.show();
 }

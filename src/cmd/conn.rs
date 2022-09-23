@@ -33,7 +33,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .possible_value("tassadar")
                 .possible_value("watsons_ha")
                 .multiple(false)
-                .case_insensitive(true)
+                .case_insensitive(false)
                 .value_name("Mode")
                 //.help("Use connet to business the CPE,the default version is valor."),
         )
@@ -53,9 +53,9 @@ pub fn run(args: &ArgMatches) {
     let cpe = get_cpe_by_sn_and_mode(sn, mode);
     if !cpe.check_master() && !cpe.check_backup() {
         println!("{}","Use CPE mode is Error.".red());
-        return;
+        return
     }
-    //println!("Use remote CPE mode is: {}", conn.blue().bold());
+    println!("CPE {} is: {}","Mode".blue().bold(),mode.bold());
     cpe.show();
 
     let mut input = String::new();

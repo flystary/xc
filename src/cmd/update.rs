@@ -23,7 +23,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .possible_value("watsons")
                 .possible_value("tassadar")
                 .possible_value("watsons_ha")
-                .multiple(false)
+                .multiple(true)
                 .case_insensitive(true)
                 .value_name("Mode")
                 //.help("Use show to select the CPE, the default version is valor."),
