@@ -1,8 +1,6 @@
 #[warn(unused_imports)]
 use serde_json::Value;
 use std::collections::HashMap;
-use crypto::digest::Digest;
-use crypto::md5::Md5;
 use futures::executor::block_on;
 use crate::conf::yaml::{
     Url,
@@ -15,6 +13,8 @@ use crate::conf::toml::{
 use crate::utils::cpe::{
     Cpe
 };
+use super::utils::{md5, get_unixtime};
+
 
 pub fn init_toml() -> Conf {
     let path = String::from("/etc/xc/xc.toml");
@@ -25,17 +25,6 @@ pub fn init_yaml() -> Url {
     load_url(init_toml().sys.path)
 }
 
-pub fn get_unixtime() -> i64 {
-    let times = time::get_time();
-    times.sec * 1000 + (times.nsec as f64 / 1000.0 / 1000.0) as i64
-}
-
-pub fn md5<S:Into<String>>(input: S) -> String {
-    let mut md5 = Md5::new();
-    md5.input_str(&input.into());
-    md5.result_str()
-}
-
 async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::Error> {
     let sys = init_toml().sys;
     let client = reqwest::blocking::Client::new();
@@ -43,7 +32,7 @@ async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::E
         "{}/matrix/oauth/token?client_id=browser&client_secret={}&grant_type=password&password={}&username={}",
         sys.loginurl,
         sys.secret,
-        md5(md5(sys.password)),
+        super::utils::md5(md5(sys.password)),
         sys.username
     );
 
