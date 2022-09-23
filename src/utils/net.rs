@@ -58,10 +58,8 @@ async fn get_token_by_resp() -> Option<String> {
     let result = do_get_resp().await;
     match result {
         Ok(v) => {
-            if let Some(token) = v.get("access_token") {
-                if let Value::String(token) = token {
+            if let Some(Value::String(token)) = v.get("access_token") {
                     return Some(token.to_string());
-                }
             }
         },
         Err(e) => {

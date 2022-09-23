@@ -16,7 +16,7 @@ pub struct Cpe {
     model: String,
     version: String,
     //cpeport: String,
-    updatetime:  String,
+    updatetime:    String,
     masterpopip: String,
     mastercpeip: String,
     backuppopip: String,
@@ -35,7 +35,7 @@ impl Cpe {
             .with(Modify::new(Full).with(Indent::new(1, 1, 0, 0)))
             .with(Modify::new(Head).with(Alignment::center_horizontal()))
             .with(Modify::new(Row(1..)).with(Alignment::center_horizontal()))
-            .with(Modify::new(Row(0..1)).with(Format(|s|s.white().to_uppercase().to_string())))
+            .with(Modify::new(Row(0..1)).with(Format(|s|s.white().to_uppercase())))
             .with(Modify::new(Row(1..)).with(Format(|s|s.white().to_string())));
 
         println!("{}", table);
