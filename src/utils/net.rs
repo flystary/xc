@@ -11,9 +11,10 @@ use crate::conf::toml::{
     load_conf,
 };
 use crate::utils::cpe::{
-    Cpe
+    Cpe,
+    Cpes,
+    // Ucpe,
 };
-use super::utils::{md5, get_unixtime};
 
 
 pub fn init_toml() -> Conf {
@@ -32,7 +33,7 @@ async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::E
         "{}/matrix/oauth/token?client_id=browser&client_secret={}&grant_type=password&password={}&username={}",
         sys.loginurl,
         sys.secret,
-        super::utils::md5(md5(sys.password)),
+        super::utils::md5(super::utils::md5(sys.password)),
         sys.username
     );
 
@@ -69,7 +70,7 @@ pub async fn get_pops(base: String) -> String {
         "{}?&access_token={}&_={}",
         BASE = base,
         ACCESS_TOKEN = token,
-        CLENT_TIME   = get_unixtime(),
+        CLENT_TIME   = super::utils::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
 }
@@ -84,7 +85,7 @@ pub async fn get_cpes(base: String) -> String{
         "{}?&access_token={}&_={}",
         BASE = base,
         ACCESS_TOKEN = token,
-        CLENT_TIME   = get_unixtime(),
+        CLENT_TIME   = super::utils::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
 }
@@ -99,7 +100,7 @@ pub async fn get_devices(base: String) -> String{
         "{}?&access_token={}&_={}",
         BASE = base,
         ACCESS_TOKEN = token,
-        CLENT_TIME   = get_unixtime(),
+        CLENT_TIME   = super::utils::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
 }
@@ -167,6 +168,24 @@ fn get_device_url_by_mode(mode: &str) -> Option<String> {
     let u = init_yaml();
     if let Some(cpe) = u.get_device_string(mode) {
         return Some(cpe)
+    }
+    None
+}
+
+
+pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
+
+    // let mut cpes = Vec::new();
+    // cpes
+    if let Some(_base) = get_cpe_url_by_mode(mode) {
+        // let text = block_on(get_cpes(base));
+        // let vec: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
+
+        let mut cpes = Vec::new();
+        for cpesn in cpesns {
+            cpes.push(get_cpe_by_sn_and_mode(cpesn, mode));
+        }
+        return Some(cpes);
     }
     None
 }

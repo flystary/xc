@@ -33,7 +33,7 @@ impl Cpe {
             .with(Modify::new(Head).with(Alignment::center_horizontal()))
             .with(Modify::new(Row(1..)).with(Alignment::center_horizontal()))
             .with(Modify::new(Row(0..1)).with(Format(|s|s.to_uppercase())))
-            .with(Modify::new(Row(1..)).with(Format(|s|s.to_uppercase())));
+            .with(Modify::new(Row(1..)).with(Format(|s|s.to_string())));
 
         println!("{}", table);
     }
@@ -101,18 +101,13 @@ impl Cpe {
 }
 
 
-type Cpes = Vec<Cpe>;
+pub type Cpes = Vec<Cpe>;
 
-enum Ucpe {
-    Cpe,
-    Cpes,
-}
-
-trait Display {
+pub trait Dis {
     fn show(self);
 }
 
-impl Display for Cpe {
+impl Dis for Cpe {
     fn show(self) {
         let v = vec![self];
         let table = Table::new(v)
@@ -122,14 +117,14 @@ impl Display for Cpe {
             .with(Modify::new(Head).with(Alignment::center_horizontal()))
             .with(Modify::new(Row(1..)).with(Alignment::center_horizontal()))
             .with(Modify::new(Row(0..1)).with(Format(|s|s.to_uppercase())))
-            .with(Modify::new(Row(1..)).with(Format(|s|s.to_uppercase())));
+            .with(Modify::new(Row(1..)).with(Format(|s|s.to_string())));
 
         println!("{}", table);
 
     }
 }
 
-impl Display for Cpes {
+impl Dis for Cpes {
     fn show(self) {
         let v = self;
         let table = Table::new(v)
@@ -139,7 +134,7 @@ impl Display for Cpes {
             .with(Modify::new(Head).with(Alignment::center_horizontal()))
             .with(Modify::new(Row(1..)).with(Alignment::center_horizontal()))
             .with(Modify::new(Row(0..1)).with(Format(|s|s.to_uppercase())))
-            .with(Modify::new(Row(1..)).with(Format(|s|s.to_uppercase())));
+            .with(Modify::new(Row(1..)).with(Format(|s|s.to_string())));
 
         println!("{}", table);
     }

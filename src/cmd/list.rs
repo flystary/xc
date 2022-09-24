@@ -1,6 +1,6 @@
 extern crate colored;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use crate::utils::net::get_cpe_by_sn_and_mode;
+use crate::utils::{net::get_cpes_by_sn_mode, cpe::Dis};
 // use colored::*;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -38,13 +38,17 @@ pub fn run(args: &ArgMatches) {
         Some(m) => m,
         None    => "valor",
     };
-    println!("{:?}", sns);
-    let cpe = get_cpe_by_sn_and_mode(sns[0], mode);
-    if !cpe.check_master() && !cpe.check_backup() {
-        println!("{}","Use CPE mode is Error.");
-        return
-    }
-    //println!("CPE mode is: {}", mode);
     println!("CPE {} is: {}","Mode",mode);
-    cpe.show();
+    println!("{:?}", sns);
+    if let Some(cpes) = get_cpes_by_sn_mode(mode, sns) {
+        // #[derive(Debug)]
+        cpes.show()
+    }
+    // if !cpe.check_master() && !cpe.check_backup() {
+    //     println!("{}","Use CPE mode is Error.");
+    //     return
+    // }
+    //println!("CPE mode is: {}", mode);
+
+
 }
