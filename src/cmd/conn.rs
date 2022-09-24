@@ -1,7 +1,7 @@
 extern crate colored;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use crate::utils::net::get_cpe_by_sn_and_mode;
-use colored::*;
+// use colored::*;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("conn")
@@ -52,18 +52,18 @@ pub fn run(args: &ArgMatches) {
     };
     let cpe = get_cpe_by_sn_and_mode(sn, mode);
     if !cpe.check_master() && !cpe.check_backup() {
-        println!("{}","Use CPE mode is Error.".red());
+        println!("{}","Use CPE mode is Error.");
         return
     }
-    println!("CPE {} is: {}","Mode".blue().bold(),mode.bold());
+    println!("CPE {} is: {}","Mode",mode);
     cpe.show();
 
     let mut input = String::new();
-    println!("Please select {} or {} login CPE :\t", "Master".blue().bold(), "Backup".blue().bold());
-    println!("\t1) Please select {} use Master entry login CPE.\t", "a".green().bold());
-    println!("\t2) Please select {} use Backup entry login CPE.\t", "b".green().bold());
-    println!("\t3) Please select {} use Remote port login CPE.\t", "c".green().bold());
-    println!("\t4) Please select {} or {} Exit terminal.\t","q".red().bold(),"exit".red().bold());
+    println!("Please select {} or {} login CPE :\t", "Master", "Backup");
+    println!("\t1) Please select {} use Master entry login CPE.\t", "a");
+    println!("\t2) Please select {} use Backup entry login CPE.\t", "b");
+    println!("\t3) Please select {} use Remote port login CPE.\t", "c");
+    println!("\t4) Please select {} or {} Exit terminal.\t","q","exit");
 
     let _bytes = std::io::stdin().read_line(&mut input).unwrap();
 
@@ -92,7 +92,7 @@ pub fn run(args: &ArgMatches) {
             cpe.conn_master()
         }
         _ => {
-            println!("{}","Input Error.".red().bold());
+            println!("{}","Input Error.");
         }
     }
 }

@@ -1,7 +1,7 @@
 extern crate colored;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use crate::utils::net::get_cpe_by_sn_and_mode;
-use colored::*;
+// use colored::*;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("show")
@@ -37,9 +37,9 @@ pub fn run(args: &ArgMatches) {
     };
     let cpe = get_cpe_by_sn_and_mode(sn, mode);
     if !cpe.check_master() && !cpe.check_backup() {
-        println!("{}","Use CPE mode is Error.".red());
+        println!("{}","Use CPE mode is Error.");
         return;
     }
-    println!("CPE {} is: {}","Mode".blue().bold(),mode.bold());
+    println!("CPE {} is: {}","Mode",mode);
     cpe.show();
 }

@@ -1,5 +1,5 @@
 [sys]
-path = "/etc/xc/xc.rules"
+path = "F:/xc/xc.rules"
 secret = ""
 loginurl = ""
 username = ""
