@@ -12,21 +12,19 @@ use crate::utils::net::{
 
 #[derive(Tabled)]
 pub struct Cpe {
-    sn: String,
-    model: String,
-    version: String,
-    //cpeport: String,
-    updatetime:  String,
-    masterpopip: String,
-    mastercpeip: String,
-    backuppopip: String,
-    backupcpeip: String,
+    pub(crate) sn:      String,
+    pub(crate) model:   String,
+    pub(crate) version: String,
+    pub(crate) updatetime:  String,
+    pub(crate) masterpopip: String,
+    pub(crate) mastercpeip: String,
+    pub(crate) backuppopip: String,
+    pub(crate) backupcpeip: String,
+    pub(crate) remoteport:  String,
 }
 
 impl Cpe {
-    pub fn new(sn:String, model:String, version:String, _cpeport:String, updatetime:String, masterpopip:String, mastercpeip:String, backuppopip:String, backupcpeip:String) -> Cpe {
-        Cpe {sn,model,version,updatetime,masterpopip,mastercpeip,backuppopip,backupcpeip}
-    }
+
     pub fn show(&self) {
         let v = vec![self];
         let table = Table::new(v)
@@ -101,4 +99,45 @@ impl Cpe {
                 .status()
                 .expect("登录失败!");
     }
+}
+
+
+pub type Cpes = Vec<Cpe>;
+
+pub trait Dis {
+    fn show(self);
+}
+
+impl Dis for Cpe {
+    fn show(self) {
+        let v = vec![self];
+        let table = Table::new(v)
+            //.with(Style::GITHUB_MARKDOWN)
+            .with(Style::ASCII)
+            .with(Modify::new(Full).with(Indent::new(1, 1, 0, 0)))
+            .with(Modify::new(Head).with(Alignment::center_horizontal()))
+            .with(Modify::new(Row(1..)).with(Alignment::center_horizontal()))
+            .with(Modify::new(Row(0..1)).with(Format(|s|s.to_uppercase())))
+            .with(Modify::new(Row(1..)).with(Format(|s|s.to_string())));
+
+        println!("{}", table);
+
+    }
+}
+
+impl Dis for Cpes {
+    fn show(self) {
+        let v = self;
+        let table = Table::new(v)
+            //.with(Style::GITHUB_MARKDOWN)
+            .with(Style::ASCII)
+            .with(Modify::new(Full).with(Indent::new(1, 1, 0, 0)))
+            .with(Modify::new(Head).with(Alignment::center_horizontal()))
+            .with(Modify::new(Row(1..)).with(Alignment::center_horizontal()))
+            .with(Modify::new(Row(0..1)).with(Format(|s|s.to_uppercase())))
+            .with(Modify::new(Row(1..)).with(Format(|s|s.to_string())));
+
+        println!("{}", table);
+    }
+
 }
