@@ -24,6 +24,7 @@ pub struct Cpe {
 }
 
 impl Cpe {
+
     pub fn show(&self) {
         let v = vec![self];
         let table = Table::new(v)
