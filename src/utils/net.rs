@@ -17,7 +17,7 @@ use super::utils::{md5, get_unixtime};
 
 
 pub fn init_toml() -> Conf {
-    let path = String::from("/etc/xc/xc.toml");
+    let path = String::from("C:/xc/xc.toml");
     load_conf(path)
 }
 
