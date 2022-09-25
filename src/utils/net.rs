@@ -1,6 +1,7 @@
 #[warn(unused_imports)]
 use serde_json::Value;
 use std::collections::HashMap;
+use std::path::PathBuf;
 use futures::executor::block_on;
 use crate::conf::yaml::{
     Url,
@@ -18,7 +19,13 @@ use crate::utils::cpe::{
 
 
 pub fn init_toml() -> Conf {
-    let path = String::from("C:/xc/xc.toml");
+    // $HOME/.xc/xc.toml
+    // ./xc.toml
+    // C:/xc/xc.toml
+    let mut path = PathBuf::new();
+    if let Ok(buf) = super::conf::get_default_config("xc.toml"){
+        path = buf
+    }
     load_conf(path)
 }
 
