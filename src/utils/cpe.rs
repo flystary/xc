@@ -64,7 +64,7 @@ impl Cpe {
             println!("{}", "LOGIN CPE Username or password is None".red().bold());
             return
         }
-        let _output = if cfg!(target_os = "linux") {
+        if cfg!(target_os = "linux") {
             Command::new("/usr/bin/expect")
                     .arg("/etc/xc/bin/connet")
                     .arg(&self.masterpopip)
@@ -89,15 +89,17 @@ impl Cpe {
             println!("{}", "LOGIN CPE Username or password is None".red().bold());
             return
         }
-        Command::new("/usr/bin/expect")
-                .arg("/etc/xc/bin/connet")
-                .arg(&self.backuppopip)
-                .arg(&self.backupcpeip)
-                .arg(conf.jump.username)
-                .arg(conf.jump.password)
-                // .arg(format!("{}@{}", user_name, ip_name))
-                .status()
-                .expect("登录失败!");
+        if cfg!(target_os = "linux") {
+            Command::new("/usr/bin/expect")
+                    .arg("/etc/xc/bin/connet")
+                    .arg(&self.backuppopip)
+                    .arg(&self.backupcpeip)
+                    .arg(conf.jump.username)
+                    .arg(conf.jump.password)
+                    // .arg(format!("{}@{}", user_name, ip_name))
+                    .status()
+                    .expect("登录失败!");
+        }
     }
 }
 
