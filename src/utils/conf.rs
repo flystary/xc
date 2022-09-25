@@ -3,9 +3,9 @@ use anyhow::Result;
 
 pub fn get_default_config(conf: &str) -> Result<PathBuf> {
     let paths = [
+        format!("C:/xc/{}", conf),
         format!("{}/.xc/{}", std::env::var("HOME").unwrap(), conf),
         format!("./{}", conf),
-        format!("C:/xc/{}", conf),
     ];
 
     for path in paths.iter() {

@@ -64,7 +64,7 @@ impl Cpe {
             println!("{}", "LOGIN CPE Username or password is None");
             return
         }
-        let _output = if cfg!(target_os = "linux") {
+        if cfg!(target_os = "linux") {
             Command::new("/usr/bin/expect")
                     .arg("/etc/xc/bin/connet")
                     .arg(&self.masterpopip)
@@ -73,7 +73,13 @@ impl Cpe {
                     .arg(conf.jump.password)
                     .status()
                     .expect("登录失败!");
-        };
+        }
+        else if cfg!(target_os = "window") {
+            println!("{}","Windows此功能暂不支持")
+        }
+        else {
+            println!("{}","此功能暂不支持")
+        }
     }
     pub fn conn_backup(&self) {
         let conf = init_toml();
@@ -89,15 +95,24 @@ impl Cpe {
             println!("{}", "LOGIN CPE Username or password is None");
             return
         }
-        Command::new("/usr/bin/expect")
-                .arg("/etc/xc/bin/connet")
-                .arg(&self.backuppopip)
-                .arg(&self.backupcpeip)
-                .arg(conf.jump.username)
-                .arg(conf.jump.password)
-                // .arg(format!("{}@{}", user_name, ip_name))
-                .status()
-                .expect("登录失败!");
+        if cfg!(target_os = "linux") {
+            Command::new("/usr/bin/expect")
+                    .arg("/etc/xc/bin/connet")
+                    .arg(&self.backuppopip)
+                    .arg(&self.backupcpeip)
+                    .arg(conf.jump.username)
+                    .arg(conf.jump.password)
+                    // .arg(format!("{}@{}", user_name, ip_name))
+                    .status()
+                    .expect("登录失败!");
+        }
+        else if cfg!(target_os = "window") {
+            println!("{}","Windows此功能暂不支持")
+        }
+        else {
+            println!("{}","此功能暂不支持")
+        }
+
     }
 }
 
