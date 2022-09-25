@@ -1,6 +1,7 @@
 extern crate toml;
 
 use std::fs::File;
+use std::path::PathBuf;
 use std::io::prelude::*;
 use serde::Deserialize;
 
@@ -25,11 +26,11 @@ pub struct Conf {
     pub jump:  Jump,
 }
 
-pub fn load_conf(path: String) -> Conf {
+pub fn load_conf(path: PathBuf) -> Conf {
 
-    let mut file = match File::open(&path) {
+    let mut file = match File::open(path) {
         Ok(f) => f,
-        Err(e) => panic!("no such file {} exception:{}", path, e)
+        Err(e) => panic!("exception:{}", e)
     };
 
     let mut str = String::new();
