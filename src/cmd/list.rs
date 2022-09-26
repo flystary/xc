@@ -5,7 +5,7 @@ use crate::utils::{net::get_cpes_by_sn_mode, cpe::Dis};
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("list")
-        .about("Use show to obtain CPE information and display it on the current terminal")
+        .about("Use list to obtain multiple CPE information and display it on the current terminal")
         .arg(
             Arg::with_name("sn")
                 .required(true)
@@ -38,7 +38,7 @@ pub fn run(args: &ArgMatches) {
         Some(m) => m,
         None    => "valor",
     };
-    println!("CPE {} is: {}","Mode",mode);
+    println!("CPE Mode is: {}", mode);
     println!("{:?}", sns);
     if let Some(cpes) = get_cpes_by_sn_mode(mode, sns) {
         // #[derive(Debug)]

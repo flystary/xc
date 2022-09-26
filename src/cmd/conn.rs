@@ -52,18 +52,18 @@ pub fn run(args: &ArgMatches) {
     };
     let cpe = get_cpe_by_sn_and_mode(sn, mode);
     if !cpe.check_master() && !cpe.check_backup() {
-        println!("{}","Use CPE mode is Error.");
+        println!("Use CPE mode is Error.");
         return
     }
-    println!("CPE {} is: {}","Mode",mode);
+    println!("CPE Mode is: {}", mode);
     cpe.show();
 
     let mut input = String::new();
-    println!("Please select {} or {} login CPE :\t", "Master", "Backup");
-    println!("\t1) Please select {} use Master entry login CPE.\t", "a");
-    println!("\t2) Please select {} use Backup entry login CPE.\t", "b");
-    println!("\t3) Please select {} use Remote port login CPE.\t", "c");
-    println!("\t4) Please select {} or {} Exit terminal.\t","q","exit");
+    println!("Please select Master or Backup login CPE :\t");
+    println!("\t1) Please select <a> use Master entry login CPE.\t");
+    println!("\t2) Please select <b> use Backup entry login CPE.\t");
+    println!("\t3) Please select <c> use Remote port login CPE.\t");
+    println!("\t4) Please select <q> or <exit> Exit terminal.\t");
 
     let _bytes = std::io::stdin().read_line(&mut input).unwrap();
 
@@ -92,7 +92,7 @@ pub fn run(args: &ArgMatches) {
             cpe.conn_master()
         }
         _ => {
-            println!("{}","Input Error.");
+            println!("Input Error.");
         }
     }
 }

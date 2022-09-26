@@ -53,15 +53,15 @@ impl Cpe {
     pub fn conn_master(&self) {
         let conf = init_toml();
         if self.mastercpeip.as_str() == "0.0.0.0" || self.masterpopip.as_str() == "0.0.0.0" {
-            println!("{}", "CPE Master pop or cpe is 0.0.0.0");
+            println!("CPE Master pop or cpe is 0.0.0.0");
             return
         }
         if self.mastercpeip.is_empty() || self.masterpopip.is_empty() {
-            println!("{}", "CPE Master pop or cpe is None");
+            println!("CPE Master pop or cpe is None");
             return
         }
         if conf.jump.username.is_empty() || conf.jump.password.is_empty() {
-            println!("{}", "LOGIN CPE Username or password is None");
+            println!("LOGIN CPE Username or password is None");
             return
         }
         if cfg!(target_os = "linux") {
@@ -75,24 +75,24 @@ impl Cpe {
                     .expect("登录失败!");
         }
         else if cfg!(target_os = "window") {
-            println!("{}","Windows此功能暂不支持")
+            println!("Windows此功能暂不支持")
         }
         else {
-            println!("{}","此功能暂不支持")
+            println!("此功能暂不支持")
         }
     }
     pub fn conn_backup(&self) {
         let conf = init_toml();
         if self.backupcpeip.as_str() == "0.0.0.0" || self.backuppopip.as_str() == "0.0.0.0" {
-            println!("{}", "CPE Backup pop or cpe is 0.0.0.0");
+            println!("CPE Backup pop or cpe is 0.0.0.0");
             return
         }
         if self.backupcpeip.is_empty() || self.backuppopip.is_empty() {
-            println!("{}", "CPE Backup pop or cpe is None");
+            println!("CPE Backup pop or cpe is None");
             return
         }
         if conf.jump.username.is_empty() || conf.jump.password.is_empty() {
-            println!("{}", "LOGIN CPE Username or password is None");
+            println!("LOGIN CPE Username or password is None");
             return
         }
         if cfg!(target_os = "linux") {
@@ -107,10 +107,10 @@ impl Cpe {
                     .expect("登录失败!");
         }
         else if cfg!(target_os = "window") {
-            println!("{}","Windows此功能暂不支持")
+            println!("Windows此功能暂不支持")
         }
         else {
-            println!("{}","此功能暂不支持")
+            println!("此功能暂不支持")
         }
 
     }
