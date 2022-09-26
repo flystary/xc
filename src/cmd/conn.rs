@@ -60,10 +60,10 @@ pub fn run(args: &ArgMatches) {
 
     let mut input = String::new();
     println!("Please select Master or Backup login CPE :\t");
-    println!("\t1) Please select <a> use Master entry login CPE.\t");
-    println!("\t2) Please select <b> use Backup entry login CPE.\t");
-    println!("\t3) Please select <c> use Remote port login CPE.\t");
-    println!("\t4) Please select <q> or <exit> Exit terminal.\t");
+    println!("\t1) Please select < a > use Master entry login CPE.\t");
+    println!("\t2) Please select < b > use Backup entry login CPE.\t");
+    println!("\t3) Please select < c > use Remote port login CPE.\t");
+    println!("\t4) Please select < q > or < exit > Exit terminal.\t");
 
     let _bytes = std::io::stdin().read_line(&mut input).unwrap();
 
