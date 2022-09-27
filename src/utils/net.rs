@@ -53,7 +53,7 @@ async fn get_token_by_resp() -> Option<String> {
     match result {
         Ok(v) => {
             if let Some(Value::String(token)) = v.get("access_token") {
-                    return Some(token.to_string());
+                return Some(token.to_string());
             }
         },
         Err(e) => {
