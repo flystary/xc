@@ -52,11 +52,11 @@ impl Url {
     pub fn get_pop_string(self,mode: &str) -> Option<String> {
 
         match mode {
-            "tassadar" => Some(format!("{}/tassadar/{}",self.url,mode, self.tassadar.pop)),
-            "nexus"    => Some(format!("{}/nexus/{}",self.url,mode, self.nexus.pop)),
-            "watsons"  => Some(format!("{}/watsons/{}",self.url,mode, self.watsons.pop)),
+            "tassadar" => Some(format!("{}/tassadar/{}",self.url, self.tassadar.pop)),
+            "nexus"    => Some(format!("{}/nexus/{}",self.url, self.nexus.pop)),
+            "watsons"  => Some(format!("{}/watsons/{}",self.url, self.watsons.pop)),
             "watsonsha" => Some(format!("{}/watsons_ha/{}",self.url, self.watsonsha.pop)),
-            "valor"    => Some(format!("{}/valor/{}",self.url,mode, self.valor.pop)),
+            "valor"    => Some(format!("{}/valor/{}",self.url, self.valor.pop)),
             _    => None,
         }
     }
