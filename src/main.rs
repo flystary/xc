@@ -3,7 +3,7 @@
 extern crate clap;
 mod conf;
 mod cmd;
-mod utils;
+mod tools;
 use clap::App;
 
 fn run() {

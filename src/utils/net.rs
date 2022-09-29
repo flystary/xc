@@ -11,7 +11,7 @@ use crate::conf::toml::{
     Conf,
     load_conf,
 };
-use crate::utils::cpe::{
+use crate::tools::cpe::{
     Cpe,
     Cpes,
     // Ucpe,
@@ -37,7 +37,7 @@ async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::E
         "{}/matrix/oauth/token?client_id=browser&client_secret={}&grant_type=password&password={}&username={}",
         sys.loginurl,
         sys.secret,
-        super::utils::md5(super::utils::md5(sys.password)),
+        super::tools::md5(super::tools::md5(sys.password)),
         sys.username
     );
 
@@ -74,7 +74,7 @@ pub async fn get_pops(base: String) -> String {
         "{}?&access_token={}&_={}",
         BASE = base,
         ACCESS_TOKEN = token,
-        CLENT_TIME   = super::utils::get_unixtime(),
+        CLENT_TIME   = super::tools::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
 }
@@ -89,7 +89,7 @@ pub async fn get_cpes(base: String) -> String{
         "{}?&access_token={}&_={}",
         BASE = base,
         ACCESS_TOKEN = token,
-        CLENT_TIME   = super::utils::get_unixtime(),
+        CLENT_TIME   = super::tools::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
 }
@@ -104,7 +104,7 @@ pub async fn get_devices(base: String) -> String{
         "{}?&access_token={}&_={}",
         BASE = base,
         ACCESS_TOKEN = token,
-        CLENT_TIME   = super::utils::get_unixtime(),
+        CLENT_TIME   = super::tools::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
 }
