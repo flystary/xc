@@ -7,14 +7,14 @@ use std::io::prelude::*;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Url {
 	pub url:       String,
-        pub token:     String,
+    pub token:     String,
 	pub operation: String,
         modes:      Vec<String>,
         valor:      Valor,
         tassadar:   Tassadar,
         nexus:      Nexus,
         watsons:    Watsons,
-        watsons_ha: WatsonsHa,
+        watsonsha: WatsonsHa,
 }
 #[derive(Debug, Serialize, Deserialize)]
 struct Tassadar{
@@ -52,31 +52,31 @@ impl Url {
     pub fn get_pop_string(self,mode: &str) -> Option<String> {
 
         match mode {
-            "tassadar" => Some(format!("{}/{}/{}",self.url,mode, self.tassadar.pop)),
-            "nexus"    => Some(format!("{}/{}/{}",self.url,mode, self.nexus.pop)),
-            "watsons"  => Some(format!("{}/{}/{}",self.url,mode, self.watsons.pop)),
-            "watsons_ha" => Some(format!("{}/{}/{}",self.url,mode, self.watsons_ha.pop)),
-            "valor"    => Some(format!("{}/{}/{}",self.url,mode, self.valor.pop)),
+            "tassadar" => Some(format!("{}/tassadar/{}",self.url,mode, self.tassadar.pop)),
+            "nexus"    => Some(format!("{}/nexus/{}",self.url,mode, self.nexus.pop)),
+            "watsons"  => Some(format!("{}/watsons/{}",self.url,mode, self.watsons.pop)),
+            "watsonsha" => Some(format!("{}/watsons_ha/{}",self.url, self.watsonsha.pop)),
+            "valor"    => Some(format!("{}/valor/{}",self.url,mode, self.valor.pop)),
             _    => None,
         }
     }
     pub fn get_cpe_string(self, mode: &str) -> Option<String> {
         match mode {
-            "tassadar" => Some(format!("{}/{}/{}",self.url, mode, self.tassadar.cpe)),
-            "nexus"    => Some(format!("{}/{}/{}",self.url, mode, self.nexus.cpe)),
-            "watsons"  => Some(format!("{}/{}/{}",self.url, mode, self.watsons.cpe)),
-            "watsons_ha" => Some(format!("{}/{}/{}",self.url, mode, self.watsons_ha.cpe)),
-            "valor"    => Some(format!("{}/{}/{}",self.url, mode, self.valor.cpe)),
+            "tassadar" => Some(format!("{}/tassadar/{}",self.url, self.tassadar.cpe)),
+            "nexus"    => Some(format!("{}/nexus/{}",self.url, self.nexus.cpe)),
+            "watsons"  => Some(format!("{}/watsons/{}",self.url, self.watsons.cpe)),
+            "watsonsha" => Some(format!("{}/watsons_ha/{}",self.url, self.watsonsha.cpe)),
+            "valor"    => Some(format!("{}/valor/{}",self.url, self.valor.cpe)),
             _    => None,
         }
     }
     pub fn get_device_string(self, mode: &str) -> Option<String> {
         match mode {
-            "tassadar" => Some(format!("{}/{}/{}",self.url, mode, self.tassadar.dvc)),
-            "nexus"    => Some(format!("{}/{}/{}",self.url, mode, self.nexus.dvc)),
-            "watsons"  => Some(format!("{}/{}/{}",self.url, mode, self.watsons.dvc)),
-            "watsons_ha" => Some(format!("{}/{}/{}",self.url, mode, self.watsons_ha.dvc)),
-            "valor"    => Some(format!("{}/{}/{}",self.url, mode, self.valor.dvc)),
+            "tassadar" => Some(format!("{}/tassadar/{}",self.url, self.tassadar.dvc)),
+            "nexus"    => Some(format!("{}/nexus/{}",self.url, self.nexus.dvc)),
+            "watsons"  => Some(format!("{}/watsons/{}",self.url, self.watsons.dvc)),
+            "watsonsha" => Some(format!("{}/watsons_ha/{}",self.url, self.watsonsha.dvc)),
+            "valor"    => Some(format!("{}/valor/{}",self.url, self.valor.dvc)),
             _    => None,
         }
     }

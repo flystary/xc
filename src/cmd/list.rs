@@ -23,7 +23,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .possible_value("nexus")
                 .possible_value("watsons")
                 .possible_value("tassadar")
-                .possible_value("watsons_ha")
+                .possible_value("watsonsha")
                 .multiple(false)
                 .case_insensitive(true)
                 .value_name("Mode")

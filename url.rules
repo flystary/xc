@@ -5,12 +5,12 @@ url: http://xxxxx.xxx.net/xxx
 token: oauth/token
 operation: operation/boxes
 
-modes: 
+modes:
   - valor
   - tassadar
   - nexus
   - watsons
-  - watsons_ha
+  - watsonsha
 
 valor:
     cpe: business/cpes
@@ -28,7 +28,7 @@ watsons:
     cpe: nexus/business/boxes
     pop: nexus/openvpn/entries
     dvc: nexus/device/boxes
-watsons_ha:
+watsonsha:
     cpe: nexus/business/boxes
     pop: nexus/openvpn/entries
     dvc: nexus/device/boxes
