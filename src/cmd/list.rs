@@ -1,6 +1,6 @@
 extern crate colored;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use crate::tools::{net::get_cpes_by_sn_mode, cpe::Dis};
+use crate::utils::{net::get_cpes_by_sn_mode, cpe::Dis};
 use colored::*;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {

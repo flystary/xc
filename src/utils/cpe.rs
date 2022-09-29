@@ -6,7 +6,7 @@ use tabled::{Tabled, Table, Style};
 use tabled::{Full, Modify, Row, Alignment, Indent, Head, Format};
 use std::process::Command;
 use std::vec;
-use crate::tools::net::{
+use crate::utils::net::{
     init_toml,
 };
 
