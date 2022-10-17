@@ -1,6 +1,7 @@
 extern crate colored;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use crate::utils::net::get_cpe_by_sn_and_mode;
+use crate::utils::cpe::{Dis,Con};
 use colored::*;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -56,7 +57,7 @@ pub fn run(args: &ArgMatches) {
         return
     }
     println!("CPE {} is: {}","Mode".blue().bold(),mode.bold());
-    cpe.show();
+    cpe.display();
 
     let mut input = String::new();
     println!("Please select {} or {} login CPE :\t", "Master".blue().bold(), "Backup".blue().bold());
