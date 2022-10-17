@@ -119,7 +119,7 @@ pub fn get_cpe(mode: String, sn: String) -> Option<Sixc> {
             }
             return None;
         },
-        "watsons_ha" => {
+        "watsonsha" => {
             if let Some(base) = get_cpe_url_by_mode(mode) {
                 let text = block_on(get_cpes(base));
                 let v: Vec<Sixc> = serde_json::from_str(text.as_str()).unwrap();
@@ -193,7 +193,7 @@ pub fn get_pop(mode: String, id: i64) -> Option<Sixp> {
             }
             return None
         },
-        "watsons_ha" => {
+        "watsonsha" => {
             if let Some(base) = get_pop_url_by_mode(mode) {
                 let text = block_on(get_pops(base));
                 let v: Vec<Sixp> = serde_json::from_str(text.as_str()).unwrap();

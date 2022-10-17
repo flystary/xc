@@ -261,7 +261,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                             bid = id.as_i64().unwrap();
                         }
                     },
-                    "watsons_ha" => {
+                    "watsonsha" => {
                         if let Value::String(t) = &cpe["entryUpdateTime"] {
                             updatetime = t.to_string();
                         }
@@ -366,7 +366,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                     }
                 }
             },
-            "watsons_ha" => {
+            "watsonsha" => {
                 for pop in &p {
                     if pop["id"] == mid {
                         if let Value::String(m) = &pop["entryIp"] {
@@ -513,7 +513,7 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
                   }
                 }
             },
-            "watsons_ha" => {
+            "watsonsha" => {
                 if let Value::String(t) = &cpe["entryUpdateTime"] {
                     updatetime = t.to_string();
                 }

@@ -1,6 +1,7 @@
 extern crate colored;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use crate::utils::net::get_cpe_by_sn_and_mode;
+use crate::utils::cpe::{Dis, Conn};
 // use colored::*;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -21,7 +22,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .possible_value("nexus")
                 .possible_value("watsons")
                 .possible_value("tassadar")
-                .possible_value("watsons_ha")
+                .possible_value("watsonsha")
                 .multiple(false)
                 .case_insensitive(true)
                 .value_name("Mode")

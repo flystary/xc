@@ -25,7 +25,7 @@ FLAGS:
 
 OPTIONS:
     -m <mode>        Use show to select the CPE, the default version is nexus. [possible values: nexus, valor, watsons,
-                     watsons_ha, tassadar]
+                     watsonsha, tassadar]
 
 ARGS:
     <sn>    cpe serial number
@@ -39,7 +39,7 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-    -m, --mode <Mode>     [possible values: valor, nexus, watsons, tassadar, watsons_ha]
+    -m, --mode <Mode>     [possible values: valor, nexus, watsons, tassadar, watsonsha]
 
 ARGS:
     <sn>...    cpe serial number
