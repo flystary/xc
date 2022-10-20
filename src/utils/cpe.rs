@@ -95,12 +95,24 @@ impl Con for Cpe {
             return
         }
         if cfg!(target_os = "linux") {
+            if self.model.as_str() == "7XEC2000-260" || self.model.as_str() == "7XEC2000-100" {
+                Command::new("/usr/bin/expect")
+                        .arg("/etc/xc/bin/connet")
+                        .arg(&self.masterpopip)
+                        .arg(&self.mastercpeip)
+                        .arg(&conf.jump.username)
+                        .arg(&conf.jump.password)
+                        .arg("ucpe")
+                        .status()
+                        .expect("登录失败!");
+                return
+            }
             Command::new("/usr/bin/expect")
                     .arg("/etc/xc/bin/connet")
                     .arg(&self.masterpopip)
                     .arg(&self.mastercpeip)
-                    .arg(conf.jump.username)
-                    .arg(conf.jump.password)
+                    .arg(&conf.jump.username)
+                    .arg(&conf.jump.password)
                     .status()
                     .expect("登录失败!");
         };
@@ -120,13 +132,24 @@ impl Con for Cpe {
             return
         }
         if cfg!(target_os = "linux") {
+            if self.model.as_str() == "7XEC2000-260" || self.model.as_str() == "7XEC2000-100" {
+                Command::new("/usr/bin/expect")
+                        .arg("/etc/xc/bin/connet")
+                        .arg(&self.backuppopip)
+                        .arg(&self.backupcpeip)
+                        .arg(&conf.jump.username)
+                        .arg(&conf.jump.password)
+                        .arg("ucpe")
+                        .status()
+                        .expect("登录失败!");
+                return
+            }
             Command::new("/usr/bin/expect")
                     .arg("/etc/xc/bin/connet")
                     .arg(&self.backuppopip)
                     .arg(&self.backupcpeip)
                     .arg(conf.jump.username)
                     .arg(conf.jump.password)
-                    // .arg(format!("{}@{}", user_name, ip_name))
                     .status()
                     .expect("登录失败!");
         }

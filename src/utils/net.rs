@@ -72,9 +72,9 @@ pub async fn get_pops(base: String) -> String {
     }
     let url = format!(
         "{}?&access_token={}&_={}",
-        BASE = base,
-        ACCESS_TOKEN = token,
-        CLENT_TIME   = super::tools::get_unixtime(),
+        base,
+        token,
+        super::tools::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
 }
@@ -87,9 +87,9 @@ pub async fn get_cpes(base: String) -> String{
     }
     let url = format!(
         "{}?&access_token={}&_={}",
-        BASE = base,
-        ACCESS_TOKEN = token,
-        CLENT_TIME   = super::tools::get_unixtime(),
+        base,
+        token,
+        super::tools::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
 }
@@ -102,9 +102,9 @@ pub async fn get_devices(base: String) -> String{
     }
     let url = format!(
         "{}?&access_token={}&_={}",
-        BASE = base,
-        ACCESS_TOKEN = token,
-        CLENT_TIME   = super::tools::get_unixtime(),
+        base,
+        token,
+        super::tools::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
 }
