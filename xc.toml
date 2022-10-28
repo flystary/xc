@@ -1,11 +1,11 @@
 [sys]
 path = "/etc/xc/url.rules"
-secret = "b7n3i7kzg22y3p035rw3rd9sfzvs4cv0"
-loginurl = "http://internal.oss.7x-networks.net"
-username = "matrix"
-password = "4A9sOpYL"
+secret = ""
+loginurl = ""
+username = ""
+password = ""
 
 
 [jump]
-username = "quanlin.li"
-password = "qweasdRF123"
+username = ""
+password = ""
