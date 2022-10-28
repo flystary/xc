@@ -5,7 +5,7 @@ url: http://xxxxx.xxx.net/xxx
 token: oauth/token
 operation: operation/boxes
 
-modes:
+modes: 
   - valor
   - tassadar
   - nexus

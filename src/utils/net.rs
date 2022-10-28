@@ -86,7 +86,7 @@ pub async fn get_cpes(base: String) -> String{
         token = tk
     }
     let url = format!(
-        "{}?&access_token={}&_={}",
+        "{}?pageSize=1000&access_token={}&_={}",
         base,
         token,
         super::tools::get_unixtime(),
@@ -109,17 +109,20 @@ pub async fn get_devices(base: String) -> String{
     reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
 }
 
-
 pub fn get_cpe(mode: &str, sn: &str) ->Option<Value> {
     if let Some(base) = get_cpe_url_by_mode(mode) {
         let text = block_on(get_cpes(base));
-        let v: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
-        for cpe in v {
-            if cpe["sn"] == *sn {
-                return Some(cpe);
+        if let Value::Object(vs) = serde_json::from_str(text.as_str()).unwrap() {
+            if let Value::Array(value) = vs["data"].clone() {
+            // let vs = value["data"];
+                for cpe in value {
+                    if &cpe["sn"] == sn {
+                        return Some(cpe);
+                    }
+                }
             }
+            return None
         }
-        return None
     }
     None
 }
@@ -181,13 +184,17 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
     let mut ctext = String::new();
     let mut dtext = String::new();
     let mut ptext = String::new();
-
     let mut cpes = Vec::new();
+    let mut c:Vec<Value> = Vec::new();
 
     if let Some(base) = get_cpe_url_by_mode(mode) {
         ctext = block_on(get_cpes(base));
     }
-    let c: Vec<Value> = serde_json::from_str(ctext.as_str()).unwrap();
+    if let Value::Object(cs) = serde_json::from_str(ctext.as_str()).unwrap() {
+        if let Value::Array(v) = cs["data"].clone() {
+           c = v;
+        }
+    }
 
     if let Some(base) = get_device_url_by_mode(mode) {
         dtext = block_on(get_devices(base));

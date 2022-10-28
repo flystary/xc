@@ -10,6 +10,8 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
         .arg(
             Arg::with_name("sn")
                 .required(true)
+                .multiple(true)
+                .takes_value(true)
                 .help("cpe serial number"),
         )
         //.arg(
@@ -41,16 +43,13 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
 }
 
 pub fn run(args: &ArgMatches) {
-    let sn = args.value_of("sn").unwrap();
-    //let conn: &str = match args.value_of("connmode") {
-    //    Some(m) => m,
-    //    None    => "ssh",
-    //};
-
+    //let sn = args.values_of("sn").unwrap();
+    let sns: Vec<_> = args.values_of("sn").unwrap().collect();
     let mode: &str = match args.value_of("mode") {
         Some(m) => m,
         None    => "valor",
     };
+    let sn  = sns[sns.len() - 1]; 
     let cpe = get_cpe_by_sn_and_mode(sn, mode);
     if !cpe.check_master() && !cpe.check_backup() {
         println!("{}","Use CPE mode is Error.".red());
