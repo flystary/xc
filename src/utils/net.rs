@@ -1,8 +1,8 @@
 use crate::conf::toml::{load_conf, Conf};
 use crate::conf::yaml::{load_url, Url};
 use crate::utils::action::{
-    Cpe,
-    Cpes,
+    Ucpe,
+    Ucpes,
     // Ucpe,
 };
 use crate::utils::cpe::*;
@@ -60,15 +60,14 @@ pub async fn get_token_by_resp() -> Option<String> {
     None
 }
 
-pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
-    let mut ctext = String::new();
+pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
     let mut dtext = String::new();
     let mut ptext = String::new();
-    let mut cpes = Vec::new();
-    let mut c: Vec<Value> = Vec::new();
+    let mut ucpes = Vec::new(); //table
+    let mut cpes: Vec<Value> = Vec::new(); //http
 
     if let Some(data) = get_cpes(mode) {
-        c = data
+        cpes = data
     }
 
     if let Some(base) = get_dve_url_by_mode(mode) {
@@ -93,7 +92,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
         let mut mastercpeip = String::new();
         let mut backuppopip = String::new();
         let mut backupcpeip = String::new();
-        for cpe in &c {
+        for cpe in &cpes {
             if cpe["sn"] == *cpesn {
                 if let Value::String(s) = &cpe["sn"] {
                     sn = s.to_string();
@@ -303,7 +302,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
             }
         }
 
-        cpes.push(Cpe {
+        ucpes.push(Ucpe {
             sn,
             model,
             version,
@@ -315,13 +314,15 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
             remoteport,
         })
     }
-    Some(cpes)
+    Some(ucpes)
 }
 
-pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
+pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Ucpe {
     let mut mid = 0;
     let mut bid = 0;
 
+    let mut cpe = Value::Null;
+    
     let mut sn = String::new();
     let mut model = String::new();
     let mut version = String::new();
@@ -333,160 +334,166 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
     let mut backuppopip = String::new();
     let mut backupcpeip = String::new();
 
-    if let Some(cpe) = get_cpe(mode, cpesn) {
-        if let Value::String(s) = &cpe["sn"] {
-            sn = s.to_string();
+    if let Some(values) = get_cpes(mode) {
+        for value in values {
+            if value["sn"] == cpesn {
+                cpe = value
+            }
         }
-        if let Value::String(m) = &cpe["model"] {
-            model = m.to_string();
+    }
+
+    if let Value::String(s) = &cpe["sn"] {
+        sn = s.to_string();
+    }
+    if let Value::String(m) = &cpe["model"] {
+        model = m.to_string();
+    }
+    if let Value::String(v) = &cpe["softwareVersion"] {
+        version = v.to_string();
+    }
+    match mode {
+        "nexus" => {
+            if let Value::String(t) = &cpe["entryUpdateTime"] {
+                updatetime = t.to_string();
+            }
+            if let Value::String(m) = &cpe["masterEntryIp"] {
+                mastercpeip = m.to_string();
+            }
+            if let Value::String(b) = &cpe["backupEntryIp"] {
+                backupcpeip = b.to_string();
+            }
+            if let Value::Number(id) = &cpe["masterEntryId"] {
+                mid = id.as_i64().unwrap();
+            }
+            if let Value::Number(id) = &cpe["backupEntryId"] {
+                bid = id.as_i64().unwrap();
+            }
+
+            if let Some(p) = get_pop(mode, mid) {
+                if let Value::String(m) = &p["entryIp"] {
+                    masterpopip = m.to_string();
+                }
+            }
+            if let Some(p) = get_pop(mode, bid) {
+                if let Value::String(b) = &p["entryIp"] {
+                    backuppopip = b.to_string();
+                }
+            }
         }
-        if let Value::String(v) = &cpe["softwareVersion"] {
-            version = v.to_string();
+        "watsons" => {
+            if let Value::String(t) = &cpe["entryUpdateTime"] {
+                updatetime = t.to_string();
+            }
+            if let Value::String(m) = &cpe["masterEntryIp"] {
+                mastercpeip = m.to_string();
+            }
+            if let Value::String(b) = &cpe["backupEntryIp"] {
+                backupcpeip = b.to_string();
+            }
+            if let Value::Number(id) = &cpe["masterEntryId"] {
+                mid = id.as_i64().unwrap();
+            }
+            if let Value::Number(id) = &cpe["backupEntryId"] {
+                bid = id.as_i64().unwrap();
+            }
+
+            if let Some(p) = get_pop(mode, mid) {
+                if let Value::String(m) = &p["entryIp"] {
+                    masterpopip = m.to_string();
+                }
+            }
+            if let Some(p) = get_pop(mode, bid) {
+                if let Value::String(b) = &p["entryIp"] {
+                    backuppopip = b.to_string();
+                }
+            }
         }
-        match mode {
-            "nexus" => {
-                if let Value::String(t) = &cpe["entryUpdateTime"] {
-                    updatetime = t.to_string();
-                }
-                if let Value::String(m) = &cpe["masterEntryIp"] {
-                    mastercpeip = m.to_string();
-                }
-                if let Value::String(b) = &cpe["backupEntryIp"] {
-                    backupcpeip = b.to_string();
-                }
-                if let Value::Number(id) = &cpe["masterEntryId"] {
-                    mid = id.as_i64().unwrap();
-                }
-                if let Value::Number(id) = &cpe["backupEntryId"] {
-                    bid = id.as_i64().unwrap();
-                }
+        "watsonsha" => {
+            if let Value::String(t) = &cpe["entryUpdateTime"] {
+                updatetime = t.to_string();
+            }
+            if let Value::String(m) = &cpe["masterEntryIp"] {
+                mastercpeip = m.to_string();
+            }
+            if let Value::String(b) = &cpe["backupEntryIp"] {
+                backupcpeip = b.to_string();
+            }
+            if let Value::Number(id) = &cpe["masterEntryId"] {
+                mid = id.as_i64().unwrap();
+            }
+            if let Value::Number(id) = &cpe["backupEntryId"] {
+                bid = id.as_i64().unwrap();
+            }
 
-                if let Some(p) = get_pop(mode, mid) {
-                    if let Value::String(m) = &p["entryIp"] {
-                        masterpopip = m.to_string();
-                    }
-                }
-                if let Some(p) = get_pop(mode, bid) {
-                    if let Value::String(b) = &p["entryIp"] {
-                        backuppopip = b.to_string();
-                    }
+            if let Some(p) = get_pop(mode, mid) {
+                if let Value::String(m) = &p["entryIp"] {
+                    masterpopip = m.to_string();
                 }
             }
-            "watsons" => {
-                if let Value::String(t) = &cpe["entryUpdateTime"] {
-                    updatetime = t.to_string();
+            if let Some(p) = get_pop(mode, bid) {
+                if let Value::String(b) = &p["entryIp"] {
+                    backuppopip = b.to_string();
                 }
-                if let Value::String(m) = &cpe["masterEntryIp"] {
-                    mastercpeip = m.to_string();
-                }
-                if let Value::String(b) = &cpe["backupEntryIp"] {
-                    backupcpeip = b.to_string();
-                }
-                if let Value::Number(id) = &cpe["masterEntryId"] {
-                    mid = id.as_i64().unwrap();
-                }
-                if let Value::Number(id) = &cpe["backupEntryId"] {
-                    bid = id.as_i64().unwrap();
-                }
+            }
+        }
+        "valor" => {
+            if let Value::String(t) = &cpe["entryUpdateTime"] {
+                updatetime = t.to_string();
+            }
+            if let Value::String(m) = &cpe["masterPopIp"] {
+                mastercpeip = m.to_string();
+            }
+            if let Value::String(b) = &cpe["backupPopIp"] {
+                backupcpeip = b.to_string();
+            }
+            if let Value::Number(id) = &cpe["masterPopId"] {
+                mid = id.as_i64().unwrap();
+            }
+            if let Value::Number(id) = &cpe["backupPopId"] {
+                bid = id.as_i64().unwrap();
+            }
 
-                if let Some(p) = get_pop(mode, mid) {
-                    if let Value::String(m) = &p["entryIp"] {
-                        masterpopip = m.to_string();
-                    }
-                }
-                if let Some(p) = get_pop(mode, bid) {
-                    if let Value::String(b) = &p["entryIp"] {
-                        backuppopip = b.to_string();
-                    }
+            if let Some(p) = get_pop(mode, mid) {
+                if let Value::String(m) = &p["popIp"] {
+                    masterpopip = m.to_string();
                 }
             }
-            "watsonsha" => {
-                if let Value::String(t) = &cpe["entryUpdateTime"] {
-                    updatetime = t.to_string();
+            if let Some(p) = get_pop(mode, bid) {
+                if let Value::String(b) = &p["popIp"] {
+                    backuppopip = b.to_string();
                 }
-                if let Value::String(m) = &cpe["masterEntryIp"] {
-                    mastercpeip = m.to_string();
-                }
-                if let Value::String(b) = &cpe["backupEntryIp"] {
-                    backupcpeip = b.to_string();
-                }
-                if let Value::Number(id) = &cpe["masterEntryId"] {
-                    mid = id.as_i64().unwrap();
-                }
-                if let Value::Number(id) = &cpe["backupEntryId"] {
-                    bid = id.as_i64().unwrap();
-                }
+            }
+        }
+        "tassadar" => {
+            if let Value::String(t) = &cpe["popUpdateTime"] {
+                updatetime = t.to_string();
+            }
+            if let Value::String(m) = &cpe["masterPopIp"] {
+                mastercpeip = m.to_string();
+            }
+            if let Value::String(b) = &cpe["backupPopIp"] {
+                backupcpeip = b.to_string();
+            }
+            if let Value::Number(id) = &cpe["masterPopId"] {
+                mid = id.as_i64().unwrap();
+            }
+            if let Value::Number(id) = &cpe["backupPopId"] {
+                bid = id.as_i64().unwrap();
+            }
 
-                if let Some(p) = get_pop(mode, mid) {
-                    if let Value::String(m) = &p["entryIp"] {
-                        masterpopip = m.to_string();
-                    }
-                }
-                if let Some(p) = get_pop(mode, bid) {
-                    if let Value::String(b) = &p["entryIp"] {
-                        backuppopip = b.to_string();
-                    }
+            if let Some(p) = get_pop(mode, mid) {
+                if let Value::String(m) = &p["entryIp"] {
+                    masterpopip = m.to_string();
                 }
             }
-            "valor" => {
-                if let Value::String(t) = &cpe["entryUpdateTime"] {
-                    updatetime = t.to_string();
-                }
-                if let Value::String(m) = &cpe["masterPopIp"] {
-                    mastercpeip = m.to_string();
-                }
-                if let Value::String(b) = &cpe["backupPopIp"] {
-                    backupcpeip = b.to_string();
-                }
-                if let Value::Number(id) = &cpe["masterPopId"] {
-                    mid = id.as_i64().unwrap();
-                }
-                if let Value::Number(id) = &cpe["backupPopId"] {
-                    bid = id.as_i64().unwrap();
-                }
-
-                if let Some(p) = get_pop(mode, mid) {
-                    if let Value::String(m) = &p["popIp"] {
-                        masterpopip = m.to_string();
-                    }
-                }
-                if let Some(p) = get_pop(mode, bid) {
-                    if let Value::String(b) = &p["popIp"] {
-                        backuppopip = b.to_string();
-                    }
+            if let Some(p) = get_pop(mode, bid) {
+                if let Value::String(b) = &p["entryIp"] {
+                    backuppopip = b.to_string();
                 }
             }
-            "tassadar" => {
-                if let Value::String(t) = &cpe["popUpdateTime"] {
-                    updatetime = t.to_string();
-                }
-                if let Value::String(m) = &cpe["masterPopIp"] {
-                    mastercpeip = m.to_string();
-                }
-                if let Value::String(b) = &cpe["backupPopIp"] {
-                    backupcpeip = b.to_string();
-                }
-                if let Value::Number(id) = &cpe["masterPopId"] {
-                    mid = id.as_i64().unwrap();
-                }
-                if let Value::Number(id) = &cpe["backupPopId"] {
-                    bid = id.as_i64().unwrap();
-                }
-
-                if let Some(p) = get_pop(mode, mid) {
-                    if let Value::String(m) = &p["entryIp"] {
-                        masterpopip = m.to_string();
-                    }
-                }
-                if let Some(p) = get_pop(mode, bid) {
-                    if let Value::String(b) = &p["entryIp"] {
-                        backuppopip = b.to_string();
-                    }
-                }
-            }
-            _ => {
-                println!("Unknown mode: {}", mode);
-            }
+        }
+        _ => {
+            println!("Unknown mode: {}", mode);
         }
     }
     if let Some(device) = get_dve(mode, cpesn) {
@@ -494,7 +501,7 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
             remoteport = p.to_string();
         }
     }
-    Cpe {
+    Ucpe {
         sn,
         model,
         version,

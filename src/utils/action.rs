@@ -9,7 +9,7 @@ use tabled::{Alignment, Format, Full, Head, Indent, Modify, Row};
 use tabled::{Style, Table, Tabled};
 
 #[derive(Tabled)]
-pub struct Cpe {
+pub struct Ucpe {
     pub(crate) sn: String,
     pub(crate) model: String,
     pub(crate) version: String,
@@ -21,13 +21,13 @@ pub struct Cpe {
     pub(crate) remoteport: String,
 }
 
-pub type Cpes = Vec<Cpe>;
+pub type Ucpes = Vec<Ucpe>;
 
 pub trait Dis {
     fn display(&self);
 }
 
-impl Dis for Cpe {
+impl Dis for Ucpe {
     fn display(&self) {
         // let v = vec![self];
         let table = Table::new(vec![self])
@@ -43,7 +43,7 @@ impl Dis for Cpe {
     }
 }
 
-impl Dis for Cpes {
+impl Dis for Ucpes {
     fn display(&self) {
         let table = Table::new(self)
             //.with(Style::GITHUB_MARKDOWN)
@@ -65,7 +65,7 @@ pub trait Con {
     fn conn_backup(&self);
 }
 
-impl Con for Cpe {
+impl Con for Ucpe {
     fn check_master(&self) -> bool {
         if self.mastercpeip.is_empty() && self.masterpopip.is_empty() {
             return false;
