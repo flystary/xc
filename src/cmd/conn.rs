@@ -1,5 +1,5 @@
 extern crate colored;
-use crate::utils::action::{Con, Dis};
+use crate::utils::ucpe::{Con, Dis};
 use crate::utils::net::get_cpe_by_sn_and_mode;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::*;
@@ -51,52 +51,53 @@ pub fn run(args: &ArgMatches) {
         None => "valor",
     };
     let sn = sns[sns.len() - 1];
-    let cpe = get_cpe_by_sn_and_mode(sn, mode);
-    if !cpe.check_master() && !cpe.check_backup() {
-        println!("{}", "Use CPE mode is Error.".red());
-        return;
-    }
-    println!("CPE {} is: {}", "Mode".blue().bold(), mode.bold());
-    cpe.display();
+    if let Some(cpe) = get_cpe_by_sn_and_mode(sn, mode) {
+        if !cpe.check_master() && !cpe.check_backup() {
+            println!("{}", "Use CPE mode is Error.".red());
+            return;
+        }
+        println!("CPE {} is: {}", "Mode".blue().bold(), mode.bold());
+        cpe.display();
 
-    let mut input = String::new();
-    println!(
-        "Please select {} or {} login CPE :\t",
-        "Master".blue().bold(),
-        "Backup".blue().bold()
-    );
-    println!(
-        "\t1) Please select {} use Master entry login CPE.\t",
-        "a".green().bold()
-    );
-    println!(
-        "\t2) Please select {} use Backup entry login CPE.\t",
-        "b".green().bold()
-    );
-    println!(
-        "\t3) Please select {} use Remote port login CPE.\t",
-        "c".green().bold()
-    );
-    println!(
-        "\t4) Please select {} or {} Exit terminal.\t",
-        "q".red().bold(),
-        "exit".red().bold()
-    );
+        let mut input = String::new();
+        println!(
+            "Please select {} or {} login CPE :\t",
+            "Master".blue().bold(),
+            "Backup".blue().bold()
+        );
+        println!(
+            "\t1) Please select {} use Master entry login CPE.\t",
+            "a".green().bold()
+        );
+        println!(
+            "\t2) Please select {} use Backup entry login CPE.\t",
+            "b".green().bold()
+        );
+        println!(
+            "\t3) Please select {} use Remote port login CPE.\t",
+            "c".green().bold()
+        );
+        println!(
+            "\t4) Please select {} or {} Exit terminal.\t",
+            "q".red().bold(),
+            "exit".red().bold()
+        );
 
-    let _bytes = std::io::stdin().read_line(&mut input).unwrap();
+        let _bytes = std::io::stdin().read_line(&mut input).unwrap();
 
-    match input.trim() {
-        "A" => cpe.conn_master(),
-        "a" => cpe.conn_master(),
-        "B" => cpe.conn_backup(),
-        "b" => cpe.conn_backup(),
-        "C" => cpe.conn_backup(),
-        "c" => cpe.conn_backup(),
-        "q" => {}
-        "exit" => {}
-        "" => cpe.conn_master(),
-        _ => {
-            println!("{}", "Input Error.".red().bold());
+        match input.trim() {
+            "A" => cpe.conn_master(),
+            "a" => cpe.conn_master(),
+            "B" => cpe.conn_backup(),
+            "b" => cpe.conn_backup(),
+            "C" => cpe.conn_backup(),
+            "c" => cpe.conn_backup(),
+            "q" => {}
+            "exit" => {}
+            "" => cpe.conn_master(),
+            _ => {
+                println!("{}", "Input Error.".red().bold());
+            }
         }
     }
 }

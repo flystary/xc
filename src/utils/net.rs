@@ -1,6 +1,6 @@
 use crate::conf::toml::{load_conf, Conf};
 use crate::conf::yaml::{load_url, Url};
-use crate::utils::action::{
+use crate::utils::ucpe::{
     Ucpe,
     Ucpes,
     // Ucpe,
@@ -71,12 +71,12 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
     }
 
     if let Some(base) = get_dve_url_by_mode(mode) {
-        dtext = block_on(get_dves(base));
+        dtext = block_on(get_dve_text(base));
     }
     let d: Vec<Value> = serde_json::from_str(dtext.as_str()).unwrap();
 
     if let Some(base) = get_pop_url_by_mode(mode) {
-        ptext = block_on(get_pops(base));
+        ptext = block_on(get_pop_text(base));
     }
     let p: Vec<Value> = serde_json::from_str(ptext.as_str()).unwrap();
     for cpesn in cpesns {
@@ -92,6 +92,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
         let mut mastercpeip = String::new();
         let mut backuppopip = String::new();
         let mut backupcpeip = String::new();
+
         for cpe in &cpes {
             if cpe["sn"] == *cpesn {
                 if let Value::String(s) = &cpe["sn"] {
@@ -317,12 +318,12 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
     Some(ucpes)
 }
 
-pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Ucpe {
+pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
     let mut mid = 0;
     let mut bid = 0;
 
     let mut cpe = Value::Null;
-    
+
     let mut sn = String::new();
     let mut model = String::new();
     let mut version = String::new();
@@ -501,15 +502,5 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Ucpe {
             remoteport = p.to_string();
         }
     }
-    Ucpe {
-        sn,
-        model,
-        version,
-        updatetime,
-        masterpopip,
-        mastercpeip,
-        backupcpeip,
-        backuppopip,
-        remoteport,
-    }
+    Some(Ucpe {sn, model, version, updatetime, masterpopip, mastercpeip, backupcpeip, backuppopip, remoteport})
 }

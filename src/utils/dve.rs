@@ -11,7 +11,7 @@ pub fn get_dve_url_by_mode(mode: &str) -> Option<String> {
     None
 }
 
-pub async fn get_dves(base: String) -> String {
+pub async fn get_dve_text(base: String) -> String {
     let mut token = String::new();
     let resp_token = get_token_by_resp().await;
     if let Some(tk) = resp_token {
@@ -31,7 +31,7 @@ pub async fn get_dves(base: String) -> String {
 
 pub fn get_dve(mode: &str, sn: &str) -> Option<Value> {
     if let Some(base) = get_dve_url_by_mode(mode) {
-        let text = block_on(get_dves(base));
+        let text = block_on(get_dve_text(base));
         let v: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
         for cpe in v {
             if cpe["sn"] == *sn {
