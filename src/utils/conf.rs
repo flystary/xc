@@ -13,5 +13,8 @@ pub fn get_default_config(conf: &str) -> Result<PathBuf> {
             return Ok(Path::new(path).to_path_buf());
         }
     }
-    Err(anyhow::anyhow!("Config file not found: {}", paths.join(", ")))
+    Err(anyhow::anyhow!(
+        "Config file not found: {}",
+        paths.join(", ")
+    ))
 }

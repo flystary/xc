@@ -1,5 +1,4 @@
 #[macro_use]
-// #[warn(unreachable_code)]
 extern crate clap;
 mod cmd;
 mod conf;
