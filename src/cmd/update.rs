@@ -5,13 +5,11 @@ extern crate tabled;
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("update")
         .about("Use update to update local CPE information")
-
         .arg(
             Arg::with_name("sn")
                 .required(true)
                 .help("cpe serial number"),
         )
-
         .arg(
             Arg::with_name("mode")
                 .required(false)
@@ -25,8 +23,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .possible_value("watsonsha")
                 .multiple(true)
                 .case_insensitive(true)
-                .value_name("Mode")
-                //.help("Use show to select the CPE, the default version is valor."),
+                .value_name("Mode"), //.help("Use show to select the CPE, the default version is valor."),
         )
 }
 
@@ -34,9 +31,9 @@ pub fn run(args: &ArgMatches) {
     let sn = args.value_of("sn").unwrap();
     let cpemode = args.value_of("mode");
 
-    let mode: &str =  match cpemode {
+    let mode: &str = match cpemode {
         Some(m) => m,
-        None    => "valor",
+        None => "valor",
     };
     println!("此功能暂不支持 {} {}", mode, sn);
 }

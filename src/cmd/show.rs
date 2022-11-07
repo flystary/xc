@@ -1,7 +1,7 @@
 extern crate colored;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use crate::utils::cpe::{Con, Dis};
 use crate::utils::net::get_cpe_by_sn_and_mode;
-use crate::utils::cpe::{Dis,Con};
+use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::*;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -25,8 +25,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .possible_value("watsonsha")
                 .multiple(false)
                 .case_insensitive(true)
-                .value_name("Mode")
-                //.help("Use show to select the CPE, the default version is valor."),
+                .value_name("Mode"), //.help("Use show to select the CPE, the default version is valor."),
         )
 }
 
@@ -34,13 +33,13 @@ pub fn run(args: &ArgMatches) {
     let sn = args.value_of("sn").unwrap();
     let mode: &str = match args.value_of("mode") {
         Some(m) => m,
-        None    => "valor",
+        None => "valor",
     };
     let cpe = get_cpe_by_sn_and_mode(sn, mode);
     if !cpe.check_master() && !cpe.check_backup() {
-        println!("{}","Use CPE mode is Error.".red());
+        println!("{}", "Use CPE mode is Error.".red());
         return;
     }
-    println!("CPE {} is: {}","Mode".blue().bold(),mode.bold());
+    println!("CPE {} is: {}", "Mode".blue().bold(), mode.bold());
     cpe.display();
 }

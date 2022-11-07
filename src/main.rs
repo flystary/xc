@@ -1,8 +1,8 @@
 #[macro_use]
 // #[warn(unreachable_code)]
 extern crate clap;
-mod conf;
 mod cmd;
+mod conf;
 mod utils;
 use clap::App;
 

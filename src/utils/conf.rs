@@ -1,5 +1,5 @@
-use std::path::{PathBuf, Path};
 use anyhow::Result;
+use std::path::{Path, PathBuf};
 
 pub fn get_default_config(conf: &str) -> Result<PathBuf> {
     let paths = [

@@ -1,26 +1,19 @@
-#[warn(unused_imports)]
-use serde_json::Value;
-use std::path::PathBuf;
-use std::collections::HashMap;
-use futures::executor::block_on;
-use crate::conf::yaml::{
-    Url,
-    load_url,
-};
-use crate::conf::toml::{
-    Conf,
-    load_conf,
-};
+use crate::conf::toml::{load_conf, Conf};
+use crate::conf::yaml::{load_url, Url};
 use crate::utils::cpe::{
     Cpe,
     Cpes,
     // Ucpe,
 };
-
+use futures::executor::block_on;
+#[warn(unused_imports)]
+use serde_json::Value;
+use std::collections::HashMap;
+use std::path::PathBuf;
 
 pub fn init_toml() -> Conf {
     let mut path = PathBuf::new();
-    if let Ok(buf) = super::conf::get_default_config("xc.toml"){
+    if let Ok(buf) = super::conf::get_default_config("xc.toml") {
         path = buf
     }
     load_conf(path)
@@ -55,10 +48,10 @@ async fn get_token_by_resp() -> Option<String> {
             if let Some(Value::String(token)) = v.get("access_token") {
                 return Some(token.to_string());
             }
-        },
+        }
         Err(e) => {
-            println!("get token error:{}",e);
-            return None
+            println!("get token error:{}", e);
+            return None;
         }
     }
     None
@@ -76,10 +69,13 @@ pub async fn get_pops(base: String) -> String {
         token,
         super::tools::get_unixtime(),
     );
-    reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
+    reqwest::blocking::get(url.as_str())
+        .unwrap()
+        .text()
+        .unwrap()
 }
 
-pub async fn get_cpes(base: String) -> String{
+pub async fn get_cpes(base: String) -> String {
     let mut token = String::new();
     let resp_token = get_token_by_resp().await;
     if let Some(tk) = resp_token {
@@ -91,10 +87,13 @@ pub async fn get_cpes(base: String) -> String{
         token,
         super::tools::get_unixtime(),
     );
-    reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
+    reqwest::blocking::get(url.as_str())
+        .unwrap()
+        .text()
+        .unwrap()
 }
 
-pub async fn get_devices(base: String) -> String{
+pub async fn get_devices(base: String) -> String {
     let mut token = String::new();
     let resp_token = get_token_by_resp().await;
     if let Some(tk) = resp_token {
@@ -106,28 +105,30 @@ pub async fn get_devices(base: String) -> String{
         token,
         super::tools::get_unixtime(),
     );
-    reqwest::blocking::get(url.as_str()).unwrap().text().unwrap()
+    reqwest::blocking::get(url.as_str())
+        .unwrap()
+        .text()
+        .unwrap()
 }
 
-pub fn get_cpe(mode: &str, sn: &str) ->Option<Value> {
+pub fn get_cpe(mode: &str, sn: &str) -> Option<Value> {
     if let Some(base) = get_cpe_url_by_mode(mode) {
         let text = block_on(get_cpes(base));
-        if let Value::Object(vs) = serde_json::from_str(text.as_str()).unwrap() {
-            if let Value::Array(value) = vs["data"].clone() {
-            // let vs = value["data"];
+        if let Value::Object(object) = serde_json::from_str(text.as_str()).unwrap() {
+            if let Value::Array(value) = object["data"].clone() {
                 for cpe in value {
-                    if &cpe["sn"] == sn {
+                    if cpe["sn"] == sn {
                         return Some(cpe);
                     }
                 }
             }
-            return None
+            return None;
         }
     }
     None
 }
 
-pub fn get_pop(mode: &str, id: i64) ->Option<Value> {
+pub fn get_pop(mode: &str, id: i64) -> Option<Value> {
     if let Some(base) = get_pop_url_by_mode(mode) {
         let text = block_on(get_pops(base));
         let v: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
@@ -136,21 +137,21 @@ pub fn get_pop(mode: &str, id: i64) ->Option<Value> {
                 return Some(pop);
             }
         }
-        return None
+        return None;
     }
     None
 }
 
-pub fn get_device(mode: &str, sn: &str) ->Option<Value> {
+pub fn get_device(mode: &str, sn: &str) -> Option<Value> {
     if let Some(base) = get_device_url_by_mode(mode) {
         let text = block_on(get_devices(base));
-        let v: Vec<Value>  = serde_json::from_str(text.as_str()).unwrap();
+        let v: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
         for cpe in v {
             if cpe["sn"] == *sn {
                 return Some(cpe);
             }
         }
-        return None
+        return None;
     }
     None
 }
@@ -158,7 +159,7 @@ pub fn get_device(mode: &str, sn: &str) ->Option<Value> {
 fn get_cpe_url_by_mode(mode: &str) -> Option<String> {
     let u = init_yaml();
     if let Some(cpe) = u.get_cpe_string(mode) {
-        return Some(cpe)
+        return Some(cpe);
     }
     None
 }
@@ -166,7 +167,7 @@ fn get_cpe_url_by_mode(mode: &str) -> Option<String> {
 fn get_pop_url_by_mode(mode: &str) -> Option<String> {
     let u = init_yaml();
     if let Some(pop) = u.get_pop_string(mode) {
-        return Some(pop)
+        return Some(pop);
     }
     None
 }
@@ -174,25 +175,24 @@ fn get_pop_url_by_mode(mode: &str) -> Option<String> {
 fn get_device_url_by_mode(mode: &str) -> Option<String> {
     let u = init_yaml();
     if let Some(cpe) = u.get_device_string(mode) {
-        return Some(cpe)
+        return Some(cpe);
     }
     None
 }
-
 
 pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
     let mut ctext = String::new();
     let mut dtext = String::new();
     let mut ptext = String::new();
     let mut cpes = Vec::new();
-    let mut c:Vec<Value> = Vec::new();
+    let mut c: Vec<Value> = Vec::new();
 
     if let Some(base) = get_cpe_url_by_mode(mode) {
         ctext = block_on(get_cpes(base));
     }
-    if let Value::Object(cs) = serde_json::from_str(ctext.as_str()).unwrap() {
-        if let Value::Array(v) = cs["data"].clone() {
-           c = v;
+    if let Value::Object(object) = serde_json::from_str(&ctext).unwrap() {
+        if let Value::Array(data) = object["data"].clone() {
+            c = data
         }
     }
 
@@ -213,7 +213,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
         let mut version = String::new();
         let mut remoteport = String::new();
 
-        let mut updatetime  = String::new();
+        let mut updatetime = String::new();
         let mut masterpopip = String::new();
         let mut mastercpeip = String::new();
         let mut backuppopip = String::new();
@@ -231,13 +231,13 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                 }
                 match mode {
                     "nexus" => {
-                        if let Value::String(t)  = &cpe["entryUpdateTime"] {
+                        if let Value::String(t) = &cpe["entryUpdateTime"] {
                             updatetime = t.to_string();
                         }
-                        if let Value::String(m)  = &cpe["masterEntryIp"] {
+                        if let Value::String(m) = &cpe["masterEntryIp"] {
                             mastercpeip = m.to_string();
                         }
-                        if let Value::String(b)  = &cpe["backupEntryIp"] {
+                        if let Value::String(b) = &cpe["backupEntryIp"] {
                             backupcpeip = b.to_string();
                         }
                         if let Value::Number(id) = &cpe["masterEntryId"] {
@@ -246,7 +246,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                         if let Value::Number(id) = &cpe["backupEntryId"] {
                             bid = id.as_i64().unwrap();
                         }
-                    },
+                    }
                     "watsons" => {
                         if let Value::String(t) = &cpe["entryUpdateTime"] {
                             updatetime = t.to_string();
@@ -263,7 +263,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                         if let Value::Number(id) = &cpe["backupEntryId"] {
                             bid = id.as_i64().unwrap();
                         }
-                    },
+                    }
                     "watsonsha" => {
                         if let Value::String(t) = &cpe["entryUpdateTime"] {
                             updatetime = t.to_string();
@@ -280,7 +280,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                         if let Value::Number(id) = &cpe["backupEntryId"] {
                             bid = id.as_i64().unwrap();
                         }
-                    },
+                    }
                     "valor" => {
                         if let Value::String(t) = &cpe["entryUpdateTime"] {
                             updatetime = t.to_string();
@@ -297,7 +297,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                         if let Value::Number(id) = &cpe["backupPopId"] {
                             bid = id.as_i64().unwrap();
                         }
-                    },
+                    }
                     "tassadar" => {
                         if let Value::String(t) = &cpe["popUpdateTime"] {
                             updatetime = t.to_string();
@@ -314,10 +314,10 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                         if let Value::Number(id) = &cpe["backupPopId"] {
                             bid = id.as_i64().unwrap();
                         }
-                    },
-                    _  => {
+                    }
+                    _ => {
                         println!("Unknown mode: {}", mode);
-                    },
+                    }
                 }
                 break;
             }
@@ -333,7 +333,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
         }
 
         match mode {
-            "nexus"  => {
+            "nexus" => {
                 for pop in &p {
                     if pop["id"] == mid {
                         if let Value::String(m) = &pop["entryIp"] {
@@ -350,7 +350,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                         }
                     }
                 }
-            },
+            }
             "watsons" => {
                 for pop in &p {
                     if pop["id"] == mid {
@@ -368,7 +368,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                         }
                     }
                 }
-            },
+            }
             "watsonsha" => {
                 for pop in &p {
                     if pop["id"] == mid {
@@ -386,7 +386,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                         }
                     }
                 }
-            },
+            }
             "valor" => {
                 for pop in &p {
                     if pop["id"] == mid {
@@ -394,7 +394,6 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                             masterpopip = m.to_string();
                             break;
                         }
-
                     }
                 }
                 for pop in &p {
@@ -405,7 +404,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                         }
                     }
                 }
-            },
+            }
             "tassadar" => {
                 for pop in &p {
                     if pop["id"] == mid {
@@ -423,13 +422,23 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
                         }
                     }
                 }
-            },
-            _   => {
+            }
+            _ => {
                 println!("Unknown mode: {}", mode);
             }
         }
 
-        cpes.push(Cpe {sn, model, version, updatetime, masterpopip, mastercpeip, backupcpeip, backuppopip, remoteport})
+        cpes.push(Cpe {
+            sn,
+            model,
+            version,
+            updatetime,
+            masterpopip,
+            mastercpeip,
+            backupcpeip,
+            backuppopip,
+            remoteport,
+        })
     }
     Some(cpes)
 }
@@ -443,7 +452,7 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
     let mut version = String::new();
     let mut remoteport = String::new();
 
-    let mut updatetime  = String::new();
+    let mut updatetime = String::new();
     let mut masterpopip = String::new();
     let mut mastercpeip = String::new();
     let mut backuppopip = String::new();
@@ -461,13 +470,13 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
         }
         match mode {
             "nexus" => {
-                if let Value::String(t)  = &cpe["entryUpdateTime"] {
+                if let Value::String(t) = &cpe["entryUpdateTime"] {
                     updatetime = t.to_string();
                 }
-                if let Value::String(m)  = &cpe["masterEntryIp"] {
+                if let Value::String(m) = &cpe["masterEntryIp"] {
                     mastercpeip = m.to_string();
                 }
-                if let Value::String(b)  = &cpe["backupEntryIp"] {
+                if let Value::String(b) = &cpe["backupEntryIp"] {
                     backupcpeip = b.to_string();
                 }
                 if let Value::Number(id) = &cpe["masterEntryId"] {
@@ -480,14 +489,14 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
                 if let Some(p) = get_pop(mode, mid) {
                     if let Value::String(m) = &p["entryIp"] {
                         masterpopip = m.to_string();
-                  }
+                    }
                 }
                 if let Some(p) = get_pop(mode, bid) {
                     if let Value::String(b) = &p["entryIp"] {
                         backuppopip = b.to_string();
-                  }
+                    }
                 }
-            },
+            }
             "watsons" => {
                 if let Value::String(t) = &cpe["entryUpdateTime"] {
                     updatetime = t.to_string();
@@ -508,14 +517,14 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
                 if let Some(p) = get_pop(mode, mid) {
                     if let Value::String(m) = &p["entryIp"] {
                         masterpopip = m.to_string();
-                  }
+                    }
                 }
                 if let Some(p) = get_pop(mode, bid) {
                     if let Value::String(b) = &p["entryIp"] {
                         backuppopip = b.to_string();
-                  }
+                    }
                 }
-            },
+            }
             "watsonsha" => {
                 if let Value::String(t) = &cpe["entryUpdateTime"] {
                     updatetime = t.to_string();
@@ -536,14 +545,14 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
                 if let Some(p) = get_pop(mode, mid) {
                     if let Value::String(m) = &p["entryIp"] {
                         masterpopip = m.to_string();
-                  }
+                    }
                 }
                 if let Some(p) = get_pop(mode, bid) {
                     if let Value::String(b) = &p["entryIp"] {
                         backuppopip = b.to_string();
-                  }
+                    }
                 }
-            },
+            }
             "valor" => {
                 if let Value::String(t) = &cpe["entryUpdateTime"] {
                     updatetime = t.to_string();
@@ -562,16 +571,16 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
                 }
 
                 if let Some(p) = get_pop(mode, mid) {
-                    if let Value::String(m) = &p["popIp"]{
+                    if let Value::String(m) = &p["popIp"] {
                         masterpopip = m.to_string();
-                  }
+                    }
                 }
                 if let Some(p) = get_pop(mode, bid) {
                     if let Value::String(b) = &p["popIp"] {
                         backuppopip = b.to_string();
-                  }
+                    }
                 }
-            },
+            }
             "tassadar" => {
                 if let Value::String(t) = &cpe["popUpdateTime"] {
                     updatetime = t.to_string();
@@ -592,17 +601,17 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
                 if let Some(p) = get_pop(mode, mid) {
                     if let Value::String(m) = &p["entryIp"] {
                         masterpopip = m.to_string();
-                  }
+                    }
                 }
                 if let Some(p) = get_pop(mode, bid) {
                     if let Value::String(b) = &p["entryIp"] {
                         backuppopip = b.to_string();
-                  }
+                    }
                 }
-            },
-            _  => {
+            }
+            _ => {
                 println!("Unknown mode: {}", mode);
-            },
+            }
         }
     }
     if let Some(device) = get_device(mode, cpesn) {
@@ -610,5 +619,15 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
             remoteport = p.to_string();
         }
     }
-    Cpe {sn, model, version, updatetime, masterpopip, mastercpeip, backupcpeip, backuppopip, remoteport}
+    Cpe {
+        sn,
+        model,
+        version,
+        updatetime,
+        masterpopip,
+        mastercpeip,
+        backupcpeip,
+        backuppopip,
+        remoteport,
+    }
 }
