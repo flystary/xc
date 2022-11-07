@@ -67,13 +67,8 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
     let mut cpes = Vec::new();
     let mut c: Vec<Value> = Vec::new();
 
-    if let Some(base) = get_cpe_url_by_mode(mode) {
-        ctext = block_on(get_cpes(base));
-    }
-    if let Value::Object(object) = serde_json::from_str(&ctext).unwrap() {
-        if let Value::Array(data) = object["data"].clone() {
-            c = data
-        }
+    if let Some(data) = get_cpes(mode) {
+        c = data
     }
 
     if let Some(base) = get_dve_url_by_mode(mode) {

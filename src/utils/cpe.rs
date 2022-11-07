@@ -3,7 +3,7 @@ use crate::utils::net::init_yaml;
 use futures::executor::block_on;
 use serde_json::Value;
 
-pub async fn get_cpes(base: String) -> String {
+pub async fn get_cpe_text(base: String) -> String {
     let mut token = String::new();
     let resp_token = get_token_by_resp().await;
     if let Some(tk) = resp_token {
@@ -21,9 +21,22 @@ pub async fn get_cpes(base: String) -> String {
         .unwrap()
 }
 
+pub fn get_cpes(mode: &str) -> Option<Value> {
+    if let Some(base) = get_cpe_url_by_mode(mode) {
+        let text = block_on(get_cpe_text(base));
+        if let Value::Object(object) = serde_json::from_str(text.as_str()).unwrap() {
+            if let Value::Array(vs) = object["data"].clone() {
+                return Some(vs)
+            }
+            return None;
+        }
+    }
+    None
+}
+
 pub fn get_cpe(mode: &str, sn: &str) -> Option<Value> {
     if let Some(base) = get_cpe_url_by_mode(mode) {
-        let text = block_on(get_cpes(base));
+        let text = block_on(get_cpe_text(base));
         if let Value::Object(object) = serde_json::from_str(text.as_str()).unwrap() {
             if let Value::Array(value) = object["data"].clone() {
                 for cpe in value {
