@@ -337,7 +337,7 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
 
     if let Some(values) = get_cpes(mode) {
         for value in values {
-            if value["sn"] == cpesn {
+            if cpesn == value["sn"] {
                 cpe = value
             }
         }

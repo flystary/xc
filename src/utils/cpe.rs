@@ -32,11 +32,20 @@ pub async fn get_cpe_text(base: String) -> String {
 pub fn get_cpes(mode: &str) -> Option<Vec<Value>> {
     if let Some(base) = get_cpe_url_by_mode(mode) {
         let text = block_on(get_cpe_text(base));
-        if let Value::Object(object) = serde_json::from_str(text.as_str()).unwrap() {
-            if let Value::Array(vs) = object["data"].clone() {
-                return Some(vs);
+        match mode {
+            "valor" => {
+                if let Value::Object(object) = serde_json::from_str(text.as_str()).unwrap() {
+                    if let Value::Array(vs) = object["data"].clone() {
+                        return Some(vs);
+                    }
+                    return None;
+                }
             }
-            return None;
+            _ => {
+                if let Value::Array(vs) = serde_json::from_str(text.as_str()).unwrap() {
+                    return Some(vs);
+                }
+            }
         }
     }
     None
