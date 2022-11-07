@@ -1,9 +1,17 @@
-use crate::utils::net::init_yaml;
 use serde_json::Value;
 use futures::executor::block_on;
+use crate::utils::net::init_yaml;
 use crate::utils::net::get_token_by_resp;
 
-pub async fn get_pops(base: String) -> String {
+pub fn get_dve_url_by_mode(mode: &str) -> Option<String> {
+    let u = init_yaml();
+    if let Some(cpe) = u.get_dve_string(mode) {
+        return Some(cpe);
+    }
+    None
+}
+
+pub async fn get_dves(base: String) -> String {
     let mut token = String::new();
     let resp_token = get_token_by_resp().await;
     if let Some(tk) = resp_token {
@@ -21,24 +29,16 @@ pub async fn get_pops(base: String) -> String {
         .unwrap()
 }
 
-pub fn get_pop(mode: &str, id: i64) -> Option<Value> {
-    if let Some(base) = get_pop_url_by_mode(mode) {
-        let text = block_on(get_pops(base));
+pub fn get_dve(mode: &str, sn: &str) -> Option<Value> {
+    if let Some(base) = get_dve_url_by_mode(mode) {
+        let text = block_on(get_dves(base));
         let v: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
-        for pop in v {
-            if pop["id"] == id {
-                return Some(pop);
+        for cpe in v {
+            if cpe["sn"] == *sn {
+                return Some(cpe);
             }
         }
         return None;
-    }
-    None
-}
-
-pub fn get_pop_url_by_mode(mode: &str) -> Option<String> {
-    let u = init_yaml();
-    if let Some(pop) = u.get_pop_string(mode) {
-        return Some(pop);
     }
     None
 }

@@ -1,5 +1,5 @@
 extern crate colored;
-use crate::utils::cpe::{Con, Dis};
+use crate::utils::action::{Con, Dis};
 use crate::utils::net::get_cpe_by_sn_and_mode;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::*;

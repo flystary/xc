@@ -1,6 +1,6 @@
 use crate::conf::toml::{load_conf, Conf};
 use crate::conf::yaml::{load_url, Url};
-use crate::utils::cpe::{
+use crate::utils::action::{
     Cpe,
     Cpes,
     // Ucpe,
@@ -10,6 +10,9 @@ use futures::executor::block_on;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::path::PathBuf;
+use crate::utils::cpe::*;
+use crate::utils::pop::*;
+use crate::utils::dve::*;
 
 pub fn init_toml() -> Conf {
     let mut path = PathBuf::new();
@@ -23,7 +26,7 @@ pub fn init_yaml() -> Url {
     load_url(init_toml().sys.path)
 }
 
-async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::Error> {
+pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::Error> {
     let sys = init_toml().sys;
     let client = reqwest::blocking::Client::new();
     let url = format!(
@@ -41,7 +44,7 @@ async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::E
         .json::<HashMap<String, Value>>()
 }
 
-async fn get_token_by_resp() -> Option<String> {
+pub async fn get_token_by_resp() -> Option<String> {
     let result = do_get_resp().await;
     match result {
         Ok(v) => {
@@ -53,129 +56,6 @@ async fn get_token_by_resp() -> Option<String> {
             println!("get token error:{}", e);
             return None;
         }
-    }
-    None
-}
-
-pub async fn get_pops(base: String) -> String {
-    let mut token = String::new();
-    let resp_token = get_token_by_resp().await;
-    if let Some(tk) = resp_token {
-        token = tk
-    }
-    let url = format!(
-        "{}?&access_token={}&_={}",
-        base,
-        token,
-        super::tools::get_unixtime(),
-    );
-    reqwest::blocking::get(url.as_str())
-        .unwrap()
-        .text()
-        .unwrap()
-}
-
-pub async fn get_cpes(base: String) -> String {
-    let mut token = String::new();
-    let resp_token = get_token_by_resp().await;
-    if let Some(tk) = resp_token {
-        token = tk
-    }
-    let url = format!(
-        "{}?pageSize=1000&access_token={}&_={}",
-        base,
-        token,
-        super::tools::get_unixtime(),
-    );
-    reqwest::blocking::get(url.as_str())
-        .unwrap()
-        .text()
-        .unwrap()
-}
-
-pub async fn get_devices(base: String) -> String {
-    let mut token = String::new();
-    let resp_token = get_token_by_resp().await;
-    if let Some(tk) = resp_token {
-        token = tk
-    }
-    let url = format!(
-        "{}?&access_token={}&_={}",
-        base,
-        token,
-        super::tools::get_unixtime(),
-    );
-    reqwest::blocking::get(url.as_str())
-        .unwrap()
-        .text()
-        .unwrap()
-}
-
-pub fn get_cpe(mode: &str, sn: &str) -> Option<Value> {
-    if let Some(base) = get_cpe_url_by_mode(mode) {
-        let text = block_on(get_cpes(base));
-        if let Value::Object(object) = serde_json::from_str(text.as_str()).unwrap() {
-            if let Value::Array(value) = object["data"].clone() {
-                for cpe in value {
-                    if cpe["sn"] == sn {
-                        return Some(cpe);
-                    }
-                }
-            }
-            return None;
-        }
-    }
-    None
-}
-
-pub fn get_pop(mode: &str, id: i64) -> Option<Value> {
-    if let Some(base) = get_pop_url_by_mode(mode) {
-        let text = block_on(get_pops(base));
-        let v: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
-        for pop in v {
-            if pop["id"] == id {
-                return Some(pop);
-            }
-        }
-        return None;
-    }
-    None
-}
-
-pub fn get_device(mode: &str, sn: &str) -> Option<Value> {
-    if let Some(base) = get_device_url_by_mode(mode) {
-        let text = block_on(get_devices(base));
-        let v: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
-        for cpe in v {
-            if cpe["sn"] == *sn {
-                return Some(cpe);
-            }
-        }
-        return None;
-    }
-    None
-}
-
-fn get_cpe_url_by_mode(mode: &str) -> Option<String> {
-    let u = init_yaml();
-    if let Some(cpe) = u.get_cpe_string(mode) {
-        return Some(cpe);
-    }
-    None
-}
-
-fn get_pop_url_by_mode(mode: &str) -> Option<String> {
-    let u = init_yaml();
-    if let Some(pop) = u.get_pop_string(mode) {
-        return Some(pop);
-    }
-    None
-}
-
-fn get_device_url_by_mode(mode: &str) -> Option<String> {
-    let u = init_yaml();
-    if let Some(cpe) = u.get_device_string(mode) {
-        return Some(cpe);
     }
     None
 }
@@ -196,8 +76,8 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Cpes> {
         }
     }
 
-    if let Some(base) = get_device_url_by_mode(mode) {
-        dtext = block_on(get_devices(base));
+    if let Some(base) = get_dve_url_by_mode(mode) {
+        dtext = block_on(get_dves(base));
     }
     let d: Vec<Value> = serde_json::from_str(dtext.as_str()).unwrap();
 
@@ -614,7 +494,7 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Cpe {
             }
         }
     }
-    if let Some(device) = get_device(mode, cpesn) {
+    if let Some(device) = get_dve(mode, cpesn) {
         if let Value::Number(p) = &device["serverPort"] {
             remoteport = p.to_string();
         }

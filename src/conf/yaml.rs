@@ -69,7 +69,7 @@ impl Url {
             _ => None,
         }
     }
-    pub fn get_device_string(self, mode: &str) -> Option<String> {
+    pub fn get_dve_string(self, mode: &str) -> Option<String> {
         match mode {
             "tassadar" => Some(format!("{}/tassadar/{}", self.url, self.tassadar.dvc)),
             "nexus" => Some(format!("{}/nexus/{}", self.url, self.nexus.dvc)),
