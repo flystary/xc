@@ -1,13 +1,13 @@
 use crate::conf::toml::{load_conf, Conf};
 use crate::conf::yaml::{load_url, Url};
+use crate::utils::cpe::*;
+use crate::utils::dve::*;
+use crate::utils::pop::*;
 use crate::utils::ucpe::{
     Ucpe,
     Ucpes,
     // Ucpe,
 };
-use crate::utils::cpe::*;
-use crate::utils::dve::*;
-use crate::utils::pop::*;
 use futures::executor::block_on;
 #[warn(unused_imports)]
 use serde_json::Value;
@@ -502,5 +502,15 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
             remoteport = p.to_string();
         }
     }
-    Some(Ucpe {sn, model, version, updatetime, masterpopip, mastercpeip, backupcpeip, backuppopip, remoteport})
+    Some(Ucpe {
+        sn,
+        model,
+        version,
+        updatetime,
+        masterpopip,
+        mastercpeip,
+        backupcpeip,
+        backuppopip,
+        remoteport,
+    })
 }

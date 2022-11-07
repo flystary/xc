@@ -1,6 +1,6 @@
 extern crate colored;
-use crate::utils::ucpe::Dis;
 use crate::utils::net::get_cpes_by_sn_mode;
+use crate::utils::ucpe::Dis;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::*;
 
