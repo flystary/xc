@@ -41,10 +41,16 @@ pub fn get_cpes(mode: &str) -> Option<Vec<Value>> {
     if let Some(value) = decode(mode) {
         match value {
             Value::Array(vs) => return Some(vs),
+            
+            // Value::Object(map) => {
+            //     if let Value::Array(vs) = map["data"].clone() {
+            //         return Some(vs)
+            //     }
+            // },
+
             Value::Object(map) => {
-                if let Value::Array(vs) = map["data"].clone() {
-                    return Some(vs)
-                }
+                let vs = map["data"].as_array().unwrap().to_vec();
+                return Some(vs)
             },
             _ => {
                 return None
@@ -53,26 +59,3 @@ pub fn get_cpes(mode: &str) -> Option<Vec<Value>> {
     }
     None
 }
-
-// #[warn(dead_code)]
-// pub fn get_ucpes(mode: &str) -> Option<Vec<Value>> {
-//     if let Some(base) = get_cpe_url_by_mode(mode) {
-//         let text = block_on(get_cpe_text(base));
-//         match mode {
-//             "valor" => {
-//                 if let Value::Object(object) = serde_json::from_str(text.as_str()).unwrap() {
-//                     if let Value::Array(vs) = object["data"].clone() {
-//                         return Some(vs);
-//                     }
-//                     return None;
-//                 }
-//             }
-//             _ => {
-//                 if let Value::Array(vs) = serde_json::from_str(text.as_str()).unwrap() {
-//                     return Some(vs);
-//                 }
-//             }
-//         }
-//     }
-//     None
-// }
