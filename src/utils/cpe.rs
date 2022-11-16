@@ -48,11 +48,9 @@ pub fn get_cpes(mode: &str) -> Option<Vec<Value>> {
             // },
             Value::Object(map) => {
                 let vs = map["data"].as_array().unwrap().to_vec();
-                return Some(vs)
-            },
-            _ => {
-                return None
+                return Some(vs);
             }
+            _ => return None,
         }
     }
     None
