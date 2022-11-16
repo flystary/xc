@@ -73,12 +73,12 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
     if let Some(base) = get_dve_url_by_mode(mode) {
         dtext = block_on(get_dve_text(base));
     }
-    let d: Vec<Value> = serde_json::from_str(dtext.as_str()).unwrap();
+    let devices: Vec<Value> = serde_json::from_str(dtext.as_str()).unwrap();
 
     if let Some(base) = get_pop_url_by_mode(mode) {
         ptext = block_on(get_pop_text(base));
     }
-    let p: Vec<Value> = serde_json::from_str(ptext.as_str()).unwrap();
+    let pops: Vec<Value> = serde_json::from_str(ptext.as_str()).unwrap();
     for cpesn in cpesns {
         let mut mid = 0;
         let mut bid = 0;
@@ -198,7 +198,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
             }
         }
 
-        for device in &d {
+        for device in &devices {
             if device["sn"] == *cpesn {
                 if let Value::Number(p) = &device["serverPort"] {
                     remoteport = p.to_string();
@@ -208,62 +208,8 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
         }
 
         match mode {
-            "nexus" => {
-                for pop in &p {
-                    if pop["id"] == mid {
-                        if let Value::String(m) = &pop["entryIp"] {
-                            masterpopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-                for pop in &p {
-                    if pop["id"] == bid {
-                        if let Value::String(m) = &pop["entryIp"] {
-                            backuppopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-            }
-            "watsons" => {
-                for pop in &p {
-                    if pop["id"] == mid {
-                        if let Value::String(m) = &pop["entryIp"] {
-                            masterpopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-                for pop in &p {
-                    if pop["id"] == bid {
-                        if let Value::String(m) = &pop["entryIp"] {
-                            backuppopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-            }
-            "watsonsha" => {
-                for pop in &p {
-                    if pop["id"] == mid {
-                        if let Value::String(m) = &pop["entryIp"] {
-                            masterpopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-                for pop in &p {
-                    if pop["id"] == bid {
-                        if let Value::String(m) = &pop["entryIp"] {
-                            backuppopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-            }
             "valor" => {
-                for pop in &p {
+                for pop in &pops {
                     if pop["id"] == mid {
                         if let Value::String(m) = &pop["popIp"] {
                             masterpopip = m.to_string();
@@ -271,27 +217,9 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
                         }
                     }
                 }
-                for pop in &p {
+                for pop in &pops {
                     if pop["id"] == bid {
                         if let Value::String(m) = &pop["popIp"] {
-                            backuppopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-            }
-            "tassadar" => {
-                for pop in &p {
-                    if pop["id"] == mid {
-                        if let Value::String(m) = &pop["entryIp"] {
-                            masterpopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-                for pop in &p {
-                    if pop["id"] == bid {
-                        if let Value::String(m) = &pop["entryIp"] {
                             backuppopip = m.to_string();
                             break;
                         }
@@ -299,7 +227,22 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
                 }
             }
             _ => {
-                println!("Unknown mode: {}", mode);
+                for pop in &pops {
+                    if pop["id"] == mid {
+                        if let Value::String(m) = &pop["entryIp"] {
+                            masterpopip = m.to_string();
+                            break;
+                        }
+                    }
+                }
+                for pop in &pops {
+                    if pop["id"] == bid {
+                        if let Value::String(m) = &pop["entryIp"] {
+                            backuppopip = m.to_string();
+                            break;
+                        }
+                    }
+                }
             }
         }
 
