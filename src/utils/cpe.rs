@@ -41,13 +41,11 @@ pub fn get_cpes(mode: &str) -> Option<Vec<Value>> {
     if let Some(value) = decode(mode) {
         match value {
             Value::Array(vs) => return Some(vs),
-            
             // Value::Object(map) => {
             //     if let Value::Array(vs) = map["data"].clone() {
             //         return Some(vs)
             //     }
             // },
-
             Value::Object(map) => {
                 let vs = map["data"].as_array().unwrap().to_vec();
                 return Some(vs)
