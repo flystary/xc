@@ -3,11 +3,9 @@ use crate::conf::yaml::{load_url, Url};
 use crate::utils::cpe::*;
 use crate::utils::dve::*;
 use crate::utils::pop::*;
-use crate::utils::ucpe::{
-    Ucpe,
-    Ucpes,
-    // Ucpe,
-};
+use crate::utils::ucpe::Ucpe;
+use crate::utils::ucpes::Ucpes;
+
 use futures::executor::block_on;
 #[warn(unused_imports)]
 use serde_json::Value;

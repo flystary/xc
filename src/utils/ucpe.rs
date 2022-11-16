@@ -4,7 +4,6 @@ use colored::*;
 
 use crate::utils::net::init_toml;
 use std::process::Command;
-use std::vec;
 use tabled::{Alignment, Format, Full, Head, Indent, Modify, Row};
 use tabled::{Style, Table, Tabled};
 
@@ -20,8 +19,6 @@ pub struct Ucpe {
     pub(crate) backupcpeip: String,
     pub(crate) remoteport: String,
 }
-
-pub type Ucpes = Vec<Ucpe>;
 
 pub trait Dis {
     fn display(&self);
@@ -43,26 +40,17 @@ impl Dis for Ucpe {
     }
 }
 
-impl Dis for Ucpes {
-    fn display(&self) {
-        let table = Table::new(self)
-            //.with(Style::GITHUB_MARKDOWN)
-            .with(Style::ASCII)
-            .with(Modify::new(Full).with(Indent::new(1, 1, 0, 0)))
-            .with(Modify::new(Head).with(Alignment::center_horizontal()))
-            .with(Modify::new(Row(1..)).with(Alignment::center_horizontal()))
-            .with(Modify::new(Row(0..1)).with(Format(|s| s.to_uppercase())))
-            .with(Modify::new(Row(1..)).with(Format(|s| s.to_string())));
-
-        println!("{}", table);
-    }
-}
-
 pub trait Con {
     fn check_master(&self) -> bool;
     fn check_backup(&self) -> bool;
     fn conn_master(&self);
     fn conn_backup(&self);
+
+    // fn open_report(&self)  -> bool;
+    // fn close_report(&self) -> bool;
+
+
+    // fn conn_report(&self);
 }
 
 impl Con for Ucpe {
