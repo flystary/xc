@@ -35,11 +35,11 @@ pub async fn get_token_by_resp() -> Option<String> {
             if let Some(Value::String(token)) = v.get("access_token") {
                 return Some(token.to_string());
             }
-        }
+        },
         Err(e) => {
             println!("get token error:{}", e);
-            return None;
-        }
+            return None
+        },
     }
     None
 }
@@ -68,7 +68,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
         let mut version = String::new();
         let mut remoteport = String::new();
 
-        let mut updatetime = String::new();
+        let mut updatetime  = String::new();
         let mut masterpopip = String::new();
         let mut mastercpeip = String::new();
         let mut backuppopip = String::new();
@@ -220,7 +220,7 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
     let mut version = String::new();
     let mut remoteport = String::new();
 
-    let mut updatetime = String::new();
+    let mut updatetime  = String::new();
     let mut masterpopip = String::new();
     let mut mastercpeip = String::new();
     let mut backuppopip = String::new();
