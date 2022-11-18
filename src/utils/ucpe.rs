@@ -48,8 +48,6 @@ pub trait Con {
 
     // fn open_report(&self)  -> bool;
     // fn close_report(&self) -> bool;
-
-
     // fn conn_report(&self);
 }
 
