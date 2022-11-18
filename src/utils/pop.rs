@@ -5,7 +5,7 @@ use serde_json::Value;
 
 pub fn get_pop_url_by_mode(mode: &str) -> Option<String> {
     let u = init_yaml();
-    if let Some(pop) = u.get_pop_string(mode) {
+    if let Some(pop) = u.get_pop_route(mode) {
         return Some(pop);
     }
     None

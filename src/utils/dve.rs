@@ -5,7 +5,7 @@ use serde_json::Value;
 
 pub fn get_dve_url_by_mode(mode: &str) -> Option<String> {
     let u = init_yaml();
-    if let Some(cpe) = u.get_dve_string(mode) {
+    if let Some(cpe) = u.get_dve_route(mode) {
         return Some(cpe);
     }
     None
@@ -18,7 +18,7 @@ pub async fn get_dve_text(base: String) -> String {
         token = tk
     }
     let url = format!(
-        "{}?&access_token={}&_={}",
+        "{}&access_token={}&_={}",
         base,
         token,
         super::tools::get_unixtime(),
@@ -29,13 +29,34 @@ pub async fn get_dve_text(base: String) -> String {
         .unwrap()
 }
 
-pub fn get_dve(mode: &str, sn: &str) -> Option<Value> {
+fn decode(mode: &str) -> Option<Value> {
     if let Some(base) = get_dve_url_by_mode(mode) {
         let text = block_on(get_dve_text(base));
-        let v: Vec<Value> = serde_json::from_str(text.as_str()).unwrap();
-        for cpe in v {
-            if cpe["sn"] == *sn {
-                return Some(cpe);
+        let v = serde_json::from_str(text.as_str()).unwrap();
+        return Some(v);
+    }
+    None
+}
+
+pub fn get_dves(mode: &str) -> Option<Vec<Value>> {
+    if let Some(value) = decode(mode) {
+        match value {
+            Value::Array(vs) => return Some(vs),
+            Value::Object(map) => {
+                let vs = map["data"].as_array().unwrap().to_vec();
+                return Some(vs);
+            },
+            _ => return None,
+        }
+    }
+    None
+}
+
+pub fn get_dve(mode: &str, sn: &str) -> Option<Value> {
+    if let Some(dves) = get_dves(mode) {
+        for dve in dves {
+            if dve["sn"] == *sn {
+                return Some(dve);
             }
         }
         return None;

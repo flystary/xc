@@ -17,13 +17,14 @@ pub struct Url {
     watsonsha: WatsonsHa,
 }
 #[derive(Debug, Serialize, Deserialize)]
-struct Tassadar {
-    pop: String,
+struct Valor {
     cpe: String,
+    pop: String,
     dvc: String,
+    pse: String,
 }
 #[derive(Debug, Serialize, Deserialize)]
-struct Nexus {
+struct Tassadar {
     pop: String,
     cpe: String,
     dvc: String,
@@ -33,6 +34,7 @@ struct Watsons {
     pop: String,
     cpe: String,
     dvc: String,
+    pse: String,
 }
 #[warn(non_camel_case_types)]
 #[derive(Debug, Serialize, Deserialize)]
@@ -40,42 +42,45 @@ struct WatsonsHa {
     cpe: String,
     pop: String,
     dvc: String,
+    pse: String,
 }
 #[derive(Debug, Serialize, Deserialize)]
-struct Valor {
-    cpe: String,
+struct Nexus {
     pop: String,
+    cpe: String,
     dvc: String,
 }
 
 impl Url {
-    pub fn get_pop_string(self, mode: &str) -> Option<String> {
+    pub fn get_cpe_route(self, mode: &str) -> Option<String> {
         match mode {
+            "valor" => Some(format!("{}/valor/{}?page=1&pageSize={}&", self.url, self.valor.cpe, self.valor.pse)),
+            "watsons" => Some(format!("{}/watsons/{}?page=1&pageSize={}&", self.url, self.watsons.cpe, self.watsons.pse)),
+            "watsonsha" => Some(format!("{}/watsons_ha/{}?page=1&pageSize={}&", self.url, self.watsonsha.cpe, self.watsonsha.pse)),
+            "tassadar" => Some(format!("{}/tassadar/{}?", self.url, self.tassadar.cpe)),
+            "nexus" => Some(format!("{}/nexus/{}?", self.url, self.nexus.cpe)),
+            _ => None,
+        }
+    }
+
+    pub fn get_pop_route(self, mode: &str) -> Option<String> {
+        match mode {
+            "valor" => Some(format!("{}/valor/{}", self.url, self.valor.pop)),
             "tassadar" => Some(format!("{}/tassadar/{}", self.url, self.tassadar.pop)),
-            "nexus" => Some(format!("{}/nexus/{}", self.url, self.nexus.pop)),
             "watsons" => Some(format!("{}/watsons/{}", self.url, self.watsons.pop)),
             "watsonsha" => Some(format!("{}/watsons_ha/{}", self.url, self.watsonsha.pop)),
-            "valor" => Some(format!("{}/valor/{}", self.url, self.valor.pop)),
+            "nexus" => Some(format!("{}/nexus/{}", self.url, self.nexus.pop)),
             _ => None,
         }
     }
-    pub fn get_cpe_string(self, mode: &str) -> Option<String> {
+
+    pub fn get_dve_route(self, mode: &str) -> Option<String> {
         match mode {
-            "tassadar" => Some(format!("{}/tassadar/{}", self.url, self.tassadar.cpe)),
-            "nexus" => Some(format!("{}/nexus/{}", self.url, self.nexus.cpe)),
-            "watsons" => Some(format!("{}/watsons/{}", self.url, self.watsons.cpe)),
-            "watsonsha" => Some(format!("{}/watsons_ha/{}", self.url, self.watsonsha.cpe)),
-            "valor" => Some(format!("{}/valor/{}", self.url, self.valor.cpe)),
-            _ => None,
-        }
-    }
-    pub fn get_dve_string(self, mode: &str) -> Option<String> {
-        match mode {
-            "tassadar" => Some(format!("{}/tassadar/{}", self.url, self.tassadar.dvc)),
-            "nexus" => Some(format!("{}/nexus/{}", self.url, self.nexus.dvc)),
-            "watsons" => Some(format!("{}/watsons/{}", self.url, self.watsons.dvc)),
-            "watsonsha" => Some(format!("{}/watsons_ha/{}", self.url, self.watsonsha.dvc)),
-            "valor" => Some(format!("{}/valor/{}", self.url, self.valor.dvc)),
+            "valor" => Some(format!("{}/valor/{}?", self.url, self.valor.dvc)),
+            "tassadar" => Some(format!("{}/tassadar/{}?", self.url, self.tassadar.dvc)),
+            "watsons" => Some(format!("{}/watsons/{}?page=1&pageSize={}&", self.url, self.watsons.dvc, self.watsons.pse)),
+            "watsonsha" => Some(format!("{}/watsons_ha/{}?", self.url, self.watsonsha.dvc)),
+            "nexus" => Some(format!("{}/nexus/{}?", self.url, self.nexus.dvc)),
             _ => None,
         }
     }

@@ -5,7 +5,7 @@ use serde_json::Value;
 
 pub fn get_cpe_url_by_mode(mode: &str) -> Option<String> {
     let u = init_yaml();
-    if let Some(cpe) = u.get_cpe_string(mode) {
+    if let Some(cpe) = u.get_cpe_route(mode) {
         return Some(cpe);
     }
     None
@@ -18,7 +18,7 @@ pub async fn get_cpe_text(base: String) -> String {
         token = tk
     }
     let url = format!(
-        "{}?pageSize=1000&access_token={}&_={}",
+        "{}access_token={}&_={}",
         base,
         token,
         super::tools::get_unixtime(),
@@ -28,6 +28,7 @@ pub async fn get_cpe_text(base: String) -> String {
         .text()
         .unwrap()
 }
+
 fn decode(mode: &str) -> Option<Value> {
     if let Some(base) = get_cpe_url_by_mode(mode) {
         let text = block_on(get_cpe_text(base));

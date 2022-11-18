@@ -5,7 +5,7 @@ url: http://xxxxx.xxx.net/xxx
 token: oauth/token
 operation: operation/boxes
 
-modes: 
+modes:
   - valor
   - tassadar
   - nexus
@@ -16,19 +16,22 @@ valor:
     cpe: business/cpes
     pop: vpn/entries
     dvc: device/cpes
+    pse: 1000
 tassadar:
     cpe: business/cpes
     pop: vpn/pops
     dvc: device/cpes
-nexus:
-    cpe: business/boxes
-    pop: vpn/entries
-    dvc: device/boxes
 watsons:
     cpe: nexus/business/boxes
     pop: nexus/openvpn/entries
     dvc: nexus/device/boxes
+    pse: 4500
 watsonsha:
     cpe: nexus/business/boxes
     pop: nexus/openvpn/entries
     dvc: nexus/device/boxes
+    pse: 120
+nexus:
+    cpe: business/boxes
+    pop: vpn/entries
+    dvc: device/boxes
