@@ -6,7 +6,6 @@ use crate::utils::pop::*;
 use crate::utils::ucpe::Ucpe;
 use crate::utils::ucpes::Ucpes;
 
-use futures::executor::block_on;
 #[warn(unused_imports)]
 use serde_json::Value;
 use std::collections::HashMap;
@@ -59,10 +58,10 @@ pub async fn get_token_by_resp() -> Option<String> {
 }
 
 pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
-    let mut ptext = String::new();
     let mut ucpes = Vec::new(); //table
     let mut cpes: Vec<Value> = Vec::new(); //http
     let mut dves: Vec<Value> = Vec::new(); //http
+    let mut pops: Vec<Value> = Vec::new(); //http
 
     if let Some(data) = get_cpes(mode) {
         cpes = data
@@ -70,10 +69,10 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
     if let Some(data) = get_dves(mode) {
         dves = data
     }
-    if let Some(base) = get_pop_url_by_mode(mode) {
-        ptext = block_on(get_pop_text(base));
+    if let Some(data) = get_pops(mode) {
+        pops = data
     }
-    let pops: Vec<Value> = serde_json::from_str(ptext.as_str()).unwrap();
+
     for cpesn in cpesns {
         let mut mid = 0;
         let mut bid = 0;
