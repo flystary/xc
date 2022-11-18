@@ -1,10 +1,8 @@
-use crate::utils::net::get_token_by_resp;
-use crate::utils::net::init_route;
 use futures::executor::block_on;
 use serde_json::Value;
 
 pub fn get_dve_url_by_mode(mode: &str) -> Option<String> {
-    let u = init_route();
+    let u = super::init::init_route();
     if let Some(cpe) = u.get_dve_route(mode) {
         return Some(cpe);
     }
@@ -13,7 +11,7 @@ pub fn get_dve_url_by_mode(mode: &str) -> Option<String> {
 
 pub async fn get_dve_text(base: String) -> String {
     let mut token = String::new();
-    let resp_token = get_token_by_resp().await;
+    let resp_token = super::net::get_token_by_resp().await;
     if let Some(tk) = resp_token {
         token = tk
     }
@@ -45,7 +43,7 @@ pub fn get_dves(mode: &str) -> Option<Vec<Value>> {
             Value::Object(map) => {
                 let vs = map["data"].as_array().unwrap().to_vec();
                 return Some(vs);
-            },
+            }
             _ => return None,
         }
     }

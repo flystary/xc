@@ -1,10 +1,8 @@
-use crate::utils::net::get_token_by_resp;
-use crate::utils::net::init_route;
 use futures::executor::block_on;
 use serde_json::Value;
 
 pub fn get_pop_url_by_mode(mode: &str) -> Option<String> {
-    let u = init_route();
+    let u = super::init::init_route();
     if let Some(pop) = u.get_pop_route(mode) {
         return Some(pop);
     }
@@ -13,7 +11,7 @@ pub fn get_pop_url_by_mode(mode: &str) -> Option<String> {
 
 pub async fn get_pop_text(base: String) -> String {
     let mut token = String::new();
-    let resp_token = get_token_by_resp().await;
+    let resp_token = super::net::get_token_by_resp().await;
     if let Some(tk) = resp_token {
         token = tk
     }
