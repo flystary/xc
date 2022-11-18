@@ -59,20 +59,17 @@ pub async fn get_token_by_resp() -> Option<String> {
 }
 
 pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
-    let mut dtext = String::new();
     let mut ptext = String::new();
     let mut ucpes = Vec::new(); //table
     let mut cpes: Vec<Value> = Vec::new(); //http
+    let mut dves: Vec<Value> = Vec::new(); //http
 
     if let Some(data) = get_cpes(mode) {
         cpes = data
     }
-
-    if let Some(base) = get_dve_url_by_mode(mode) {
-        dtext = block_on(get_dve_text(base));
+    if let Some(data) = get_dves(mode) {
+        dves = data
     }
-    let devices: Vec<Value> = serde_json::from_str(dtext.as_str()).unwrap();
-
     if let Some(base) = get_pop_url_by_mode(mode) {
         ptext = block_on(get_pop_text(base));
     }
@@ -163,7 +160,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
             }
         }
 
-        for device in &devices {
+        for device in &dves {
             if device["sn"] == *cpesn {
                 if let Value::Number(p) = &device["serverPort"] {
                     remoteport = p.to_string();
