@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::prelude::*;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Url {
+pub struct Route {
     pub url: String,
     pub token: String,
     pub operation: String,
@@ -51,7 +51,7 @@ struct Nexus {
     dvc: String,
 }
 
-impl Url {
+impl Route {
     pub fn get_cpe_route(self, mode: &str) -> Option<String> {
         match mode {
             "valor"     => Some(format!("{}/valor/{}?page=1&pageSize={}&", self.url, self.valor.cpe, self.valor.pse)),
@@ -86,7 +86,7 @@ impl Url {
     }
 }
 
-pub fn load_url(path: String) -> Url {
+pub fn load_route(path: String) -> Route {
     let mut file = match File::open(&path) {
         Ok(f) => f,
         Err(e) => panic!("no such file {} exception:{}", path, e),

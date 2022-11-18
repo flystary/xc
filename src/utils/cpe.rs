@@ -1,10 +1,10 @@
 use crate::utils::net::get_token_by_resp;
-use crate::utils::net::init_yaml;
+use crate::utils::net::init_route;
 use futures::executor::block_on;
 use serde_json::Value;
 
 pub fn get_cpe_url_by_mode(mode: &str) -> Option<String> {
-    let u = init_yaml();
+    let u = init_route();
     if let Some(cpe) = u.get_cpe_route(mode) {
         return Some(cpe);
     }

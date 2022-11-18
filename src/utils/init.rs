@@ -18,3 +18,15 @@ pub fn get_default_config(conf: &str) -> Result<PathBuf> {
         paths.join(", ")
     ))
 }
+
+pub fn init_conf() -> Conf {
+    let mut path = PathBuf::new();
+    if let Ok(buf) = super::init::get_default_config("xc.toml") {
+        path = buf
+    }
+    load_conf(path)
+}
+
+pub fn init_route() -> Route {
+    load_route(init_conf().sys.path)
+}

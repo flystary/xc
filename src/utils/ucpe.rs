@@ -2,7 +2,7 @@ extern crate colored;
 extern crate tabled;
 use colored::*;
 
-use crate::utils::net::init_toml;
+use crate::utils::net::init_conf;
 use std::process::Command;
 use tabled::{Alignment, Format, Full, Head, Indent, Modify, Row};
 use tabled::{Style, Table, Tabled};
@@ -65,7 +65,7 @@ impl Con for Ucpe {
         true
     }
     fn conn_master(&self) {
-        let conf = init_toml();
+        let conf = init_conf();
         if self.mastercpeip.as_str() == "0.0.0.0" || self.masterpopip.as_str() == "0.0.0.0" {
             println!("{}", "CPE Master pop or cpe is 0.0.0.0".red().bold());
             return;
@@ -102,7 +102,7 @@ impl Con for Ucpe {
         };
     }
     fn conn_backup(&self) {
-        let conf = init_toml();
+        let conf = init_conf();
         if self.backupcpeip.as_str() == "0.0.0.0" || self.backuppopip.as_str() == "0.0.0.0" {
             println!("{}", "CPE Backup pop or cpe is 0.0.0.0".red().bold());
             return;

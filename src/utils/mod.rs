@@ -1,4 +1,4 @@
-pub mod conf;
+pub mod init;
 pub mod cpe;
 pub mod dve;
 pub mod net;

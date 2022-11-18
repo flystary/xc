@@ -1,5 +1,5 @@
-use crate::conf::toml::{load_conf, Conf};
-use crate::conf::yaml::{load_url, Url};
+use crate::conf::conf::{load_conf, Conf};
+use crate::conf::route::{load_route, Route};
 use crate::utils::cpe::*;
 use crate::utils::dve::*;
 use crate::utils::pop::*;
@@ -11,20 +11,10 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-pub fn init_toml() -> Conf {
-    let mut path = PathBuf::new();
-    if let Ok(buf) = super::conf::get_default_config("xc.toml") {
-        path = buf
-    }
-    load_conf(path)
-}
 
-pub fn init_yaml() -> Url {
-    load_url(init_toml().sys.path)
-}
 
 pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::Error> {
-    let sys = init_toml().sys;
+    let sys = init_conf().sys;
     let client = reqwest::blocking::Client::new();
     let url = format!(
         "{}/matrix/oauth/token?client_id=browser&client_secret={}&grant_type=password&password={}&username={}",
