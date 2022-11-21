@@ -10,9 +10,6 @@ use super::init::init_conf;
 use super::ucpe::Ucpe;
 use super::ucpes::Ucpes;
 
-use std::sync::Mutex;
-use once_cell::sync::Lazy;
-use futures::executor::block_on;
 
 pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::Error> {
     let sys = init_conf().sys;
@@ -48,27 +45,20 @@ pub async fn get_token_by_resp() -> Option<String> {
     None
 }
 
-pub static TOKEN: Lazy<Mutex<String>> = Lazy::new(|| {
-    let mut s = String::new();
-    if let Some(token) = block_on(get_token_by_resp()) {
-        s = token
-    }
-    Mutex::new(s)
-});
-
-pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
+pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
     let mut ucpes = Vec::new(); //table
     let mut cpes: Vec<Value> = Vec::new(); //http
     let mut dves: Vec<Value> = Vec::new(); //http
     let mut pops: Vec<Value> = Vec::new(); //http
 
-    if let Some(data) = get_cpes(mode) {
+
+    if let Some(data) = get_cpes(mode).await {
         cpes = data
     }
-    if let Some(data) = get_dves(mode) {
+    if let Some(data) = get_dves(mode).await {
         dves = data
     }
-    if let Some(data) = get_pops(mode) {
+    if let Some(data) = get_pops(mode).await {
         pops = data
     }
 
@@ -221,7 +211,7 @@ pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
     Some(ucpes)
 }
 
-pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
+pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
     let mut mid = 0;
     let mut bid = 0;
 
@@ -238,7 +228,7 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
     let mut backuppopip = String::new();
     let mut backupcpeip = String::new();
 
-    if let Some(values) = get_cpes(mode) {
+    if let Some(values) = get_cpes(mode).await {
         for value in values {
             if cpesn == value["sn"] {
                 cpe = value
@@ -315,31 +305,31 @@ pub fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
 
     match mode {
         "valor" => {
-            if let Some(p) = get_pop(mode, mid) {
+            if let Some(p) = get_pop(mode, mid).await {
                 if let Value::String(m) = &p["popIp"] {
                     masterpopip = m.to_string();
                 }
             }
-            if let Some(p) = get_pop(mode, bid) {
+            if let Some(p) = get_pop(mode, bid).await {
                 if let Value::String(b) = &p["popIp"] {
                     backuppopip = b.to_string();
                 }
             }
         }
         _ => {
-            if let Some(p) = get_pop(mode, mid) {
+            if let Some(p) = get_pop(mode, mid).await {
                 if let Value::String(m) = &p["entryIp"] {
                     masterpopip = m.to_string();
                 }
             }
-            if let Some(p) = get_pop(mode, bid) {
+            if let Some(p) = get_pop(mode, bid).await {
                 if let Value::String(b) = &p["entryIp"] {
                     backuppopip = b.to_string();
                 }
             }
         }
     }
-    if let Some(device) = get_dve(mode, cpesn) {
+    if let Some(device) = get_dve(mode, cpesn).await {
         if let Value::Number(p) = &device["serverPort"] {
             remoteport = p.to_string();
         }

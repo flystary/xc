@@ -30,7 +30,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
         )
 }
 
-pub fn run(args: &ArgMatches) {
+pub async fn run(args: &ArgMatches<'_>) {
     let sns: Vec<_> = args.values_of("sn").unwrap().collect();
     let mode: &str = match args.value_of("mode") {
         Some(m) => m,
@@ -38,7 +38,7 @@ pub fn run(args: &ArgMatches) {
     };
     println!("CPE {} is: {}", "Mode".blue().bold(), mode.bold());
     println!("{:?}", sns);
-    if let Some(cpes) = get_cpes_by_sn_mode(mode, sns) {
+    if let Some(cpes) = get_cpes_by_sn_mode(mode, sns).await {
         // #[derive(Debug)]
         cpes.display()
     }

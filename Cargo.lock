@@ -1463,13 +1463,13 @@ dependencies = [
 
 [[package]]
 name = "xc"
-version = "2.0.0"
+version = "3.0.0"
 dependencies = [
  "anyhow",
  "clap",
  "colored",
  "futures",
- "once_cell",
+ "lazy_static",
  "reqwest",
  "rust-crypto",
  "serde",

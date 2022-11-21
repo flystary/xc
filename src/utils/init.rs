@@ -3,6 +3,9 @@ use crate::load::route::{load_route, Route};
 use anyhow::Result;
 use std::path::{Path, PathBuf};
 
+use lazy_static::lazy_static;
+use futures::executor::block_on;
+
 pub fn get_default_config(conf: &str) -> Result<PathBuf> {
     let paths = [
         format!("/etc/xc/{}", conf),
@@ -31,4 +34,14 @@ pub fn init_conf() -> Conf {
 
 pub fn init_route() -> Route {
     load_route(init_conf().sys.path)
+}
+
+lazy_static! {
+    pub static ref TOKEN: String = {
+        let mut token = String::new();
+        if let Some(s) = block_on(super::net::get_token_by_resp()) {
+            token = s
+        }
+        token
+    };
 }

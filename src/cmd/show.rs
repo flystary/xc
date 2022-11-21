@@ -31,13 +31,13 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
         )
 }
 
-pub fn run(args: &ArgMatches) {
+pub async fn run(args: &ArgMatches<'_>) {
     let sn = args.value_of("sn").unwrap();
     let mode: &str = match args.value_of("mode") {
         Some(m) => m,
         None => "valor",
     };
-    if let Some(cpe) = get_cpe_by_sn_and_mode(sn, mode) {
+    if let Some(cpe) = get_cpe_by_sn_and_mode(sn, mode).await {
         if !cpe.check_master() && !cpe.check_backup() {
             println!("{}", "Use CPE mode is Error.".red());
             return;

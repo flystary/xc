@@ -1,5 +1,4 @@
 extern crate colored;
-use crate::utils::net::get_cpes_by_sn_mode;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::*;
 
@@ -30,7 +29,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
         )
 }
 
-pub fn run(args: &ArgMatches) {
+pub async fn run(args: &ArgMatches<'_>) {
     let sns: Vec<_> = args.values_of("sn").unwrap().collect();
     let mode: &str = match args.value_of("mode") {
         Some(m) => m,
@@ -38,9 +37,5 @@ pub fn run(args: &ArgMatches) {
     };
     println!("CPE {} is: {}", "Mode".blue().bold(), mode.bold());
     println!("{:?}", sns);
-    if let Some(_cpes) = get_cpes_by_sn_mode(mode, sns) {
-        // #[derive(Debug)]
-        // cpes.display()
-        println!("此功能暂不支持！")
-    }
+    println!("此功能暂不支持！")
 }
