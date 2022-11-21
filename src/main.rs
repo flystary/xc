@@ -28,6 +28,6 @@ fn run() {
 }
 
 fn main() {
-    run();
     println!("{}", TOKEN.lock().unwrap());
+    run();
 }

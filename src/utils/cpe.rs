@@ -10,14 +10,10 @@ pub fn get_cpe_url_by_mode(mode: &str) -> Option<String> {
 }
 
 pub async fn get_cpe_text(base: String) -> String {
-    let mut token = String::new();
-    if let Some(s) = super::net::get_token_by_resp().await {
-        token = s
-    }
     let url = format!(
         "{}access_token={}&_={}",
         base,
-        token,
+        super::net::TOKEN.lock().unwrap(),
         super::tools::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str())
