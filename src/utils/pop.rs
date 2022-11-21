@@ -10,15 +10,10 @@ pub fn get_pop_url_by_mode(mode: &str) -> Option<String> {
 }
 
 pub async fn get_pop_text(base: String) -> String {
-    let mut token = String::new();
-    let resp_token = super::net::get_token_by_resp().await;
-    if let Some(tk) = resp_token {
-        token = tk
-    }
     let url = format!(
         "{}?&access_token={}&_={}",
         base,
-        token,
+        super::net::TOKEN.lock().unwrap(),
         super::tools::get_unixtime(),
     );
     reqwest::blocking::get(url.as_str())
