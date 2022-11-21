@@ -1,10 +1,10 @@
 extern crate colored;
-use crate::utils::{net::get_cpes_by_sn_mode, ucpes::Dis};
+use crate::utils::net::get_cpes_by_sn_mode;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::*;
 
 pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
-    SubCommand::with_name("list")
+    SubCommand::with_name("exec")
         .about("Use show to obtain CPE information and display it on the current terminal")
         .arg(
             Arg::with_name("sn")
@@ -38,8 +38,9 @@ pub fn run(args: &ArgMatches) {
     };
     println!("CPE {} is: {}", "Mode".blue().bold(), mode.bold());
     println!("{:?}", sns);
-    if let Some(cpes) = get_cpes_by_sn_mode(mode, sns) {
+    if let Some(_cpes) = get_cpes_by_sn_mode(mode, sns) {
         // #[derive(Debug)]
-        cpes.display()
+        // cpes.display()
+        println!("此功能暂不支持！")
     }
 }
