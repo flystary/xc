@@ -1,5 +1,5 @@
-use crate::conf::conf::{load_conf, Conf};
-use crate::conf::route::{load_route, Route};
+use crate::load::conf::{load_conf, Conf};
+use crate::load::route::{load_route, Route};
 use anyhow::Result;
 use std::path::{Path, PathBuf};
 

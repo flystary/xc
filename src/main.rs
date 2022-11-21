@@ -1,9 +1,10 @@
 #[macro_use]
 extern crate clap;
 mod cmd;
-mod conf;
+mod load;
 mod utils;
 use clap::App;
+use utils::net::TOKEN;
 
 fn run() {
     let matches = App::new(crate_name!())
@@ -27,5 +28,6 @@ fn run() {
 }
 
 fn main() {
-    run()
+    run();
+    println!("{}", TOKEN.lock().unwrap());
 }

@@ -14,15 +14,6 @@ use std::sync::Mutex;
 use once_cell::sync::Lazy;
 use futures::executor::block_on;
 
-pub static TOKEN: Lazy<Mutex<String>> = Lazy::new(|| {
-    let mut t = String::new();
-    let resp_token = block_on(get_token_by_resp());
-    if let Some(token) = resp_token {
-        t = token
-    }
-    Mutex::new(t)
-});
-
 pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::Error> {
     let sys = init_conf().sys;
     let client = reqwest::blocking::Client::new();
@@ -56,6 +47,14 @@ pub async fn get_token_by_resp() -> Option<String> {
     }
     None
 }
+
+pub static TOKEN: Lazy<Mutex<String>> = Lazy::new(|| {
+    let mut s = String::new();
+    if let Some(token) = block_on(get_token_by_resp()) {
+        s = token
+    }
+    Mutex::new(s)
+});
 
 pub fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
     let mut ucpes = Vec::new(); //table
