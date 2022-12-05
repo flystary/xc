@@ -10,7 +10,7 @@ pub fn get_pop_url_by_mode(mode: &str) -> Option<String> {
 
 pub async fn get_pop_text(base: String) -> String {
     let url = format!(
-        "{}?&access_token={}&_={}",
+        "{}?access_token={}&_={}",
         base,
         super::init::TOKEN.to_string(),
         super::tools::get_unixtime(),
