@@ -6,7 +6,6 @@ mod load;
 mod utils;
 use clap::App;
 
-
 async fn run() {
     let matches = App::new(crate_name!())
         .author("flyZer0 <flyoney@163.com>")
@@ -16,7 +15,6 @@ async fn run() {
         .subcommand(cmd::show::subcommand())
         .subcommand(cmd::list::subcommand())
         .subcommand(cmd::exec::subcommand())
-
         .get_matches();
     match matches.subcommand() {
         //cmd

@@ -51,7 +51,6 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
     let mut dves: Vec<Value> = Vec::new(); //http
     let mut pops: Vec<Value> = Vec::new(); //http
 
-
     if let Some(data) = get_cpes(mode).await {
         cpes = data
     }
