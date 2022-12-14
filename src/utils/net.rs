@@ -13,7 +13,7 @@ use super::ucpes::Ucpes;
 
 pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::Error> {
     let sys = init_conf().sys;
-    let client = reqwest::blocking::Client::new();
+    let client = reqwest::Client::new();
     let url = format!(
         "{}/matrix/oauth/token?client_id=browser&client_secret={}&grant_type=password&password={}&username={}",
         sys.loginurl,
@@ -25,8 +25,10 @@ pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwes
     client
         .post(url.as_str())
         .send()
+        .await
         .unwrap()
         .json::<HashMap<String, Value>>()
+        .await
 }
 
 pub async fn get_token_by_resp() -> Option<String> {

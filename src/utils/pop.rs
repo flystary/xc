@@ -15,9 +15,11 @@ pub async fn get_pop_text(base: String) -> String {
         super::init::TOKEN.to_string(),
         super::tools::get_unixtime(),
     );
-    reqwest::blocking::get(url.as_str())
+    reqwest::get(url.as_str())
+        .await
         .unwrap()
         .text()
+        .await
         .unwrap()
 }
 
