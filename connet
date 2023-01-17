@@ -1,0 +1,95 @@
+#!/usr/bin/expect -f
+#trap sigwinch spawned
+trap {
+    set rows [stty rows]
+    set cols [stty columns]
+    stty rows $rows columns $cols < $spawn_out(slave,name)
+} WINCH
+
+
+set node_ip  [lindex $argv 0]
+set cpe_ip   [lindex $argv 1]
+set username [lindex $argv 2]
+set password [lindex $argv 3]
+set mode     [lindex $argv 4]
+
+#set J_PWD qweasdRF123
+set O_PWD OnM
+set X_P
+
+set timeout 2
+spawn ssh $username@master.jump.7x-networks.net  -p 2222
+expect {
+    #如果有yes/no关键字
+    "yes/no" {
+    	#则输入yes
+        send "yes\n"
+        #输入yes后如果输出结果有"*assword:"关键字，则输入密码
+        expect "*assword:" { send "${password}\n" }
+    }
+    #如果上次输出结果有"*assword:"关键字，则输入密码
+    "*assword:" { send "${password}\n" }
+    timeout  { send_error "User ${username} login timeout.\n";  exit 1; }
+    # expect {
+    #     "*Opt>" {
+    #         send "g\n"
+    #     }
+
+    # }
+}
+
+expect "Opt>"
+send "${node_ip} \r"
+expect "seven@*~]$"
+send "su -\r"
+expect "*assword:"
+send "${X_PWD}\r"
+expect "root@*~]#"
+
+if {$mode != "ucpe"} {
+    send "ssh -i /etc/openvpn/server/box seven@${cpe_ip}  -p 7722\r"
+    expect {
+	#如果有yes/no关键字
+        "yes/no" {
+            #则输入yes
+            send "yes\n"
+            #输入yes后如果输出结果有"*assword:"关键字，则输入密码
+            expect "Enter passphrase for key '/etc/openvpn/server/box':" { send "${O_PWD}\n" }
+        }
+        #如果上次输出结果有"*assword:"关键字，则输入密码
+        "Enter passphrase for key '/etc/openvpn/server/box':" { send "${O_PWD}\n"}
+        #timeout  {   send_error "User 'root' login timeout.\n";  exit 1;  }
+        timeout { send_error "ssh ${cpe_ip} login timeout.\n"; exit 1; }
+    }
+    set timeout 1
+    expect "$"
+    send "su -\r"
+    expect "*assword:"
+    send "${X_PWD}\r"
+    expect "#"
+
+    send "7xcli_info|head -n 1\r"
+    expect "7x"
+    interact
+} else {
+    send  "ssh -i /etc/openvpn/server/box root@${cpe_ip}  -p 7722\r"
+    expect {
+	#如果有yes/no关键字
+        "yes/no" {
+            #则输入yes
+            send "yes\n"
+            #输入yes后如果输出结果有"*assword:"关键字，则输入密码
+            expect "Enter passphrase for key '/etc/openvpn/server/box':" { send "${O_PWD}\n" }
+        }
+        #如果上次输出结果有"*assword:"关键字，则输入密码
+        "Enter passphrase for key '/etc/openvpn/server/box':" { send "${O_PWD}\n"}
+        #timeout  {   send_error "User 'root' login timeout.\n";  exit 1;  }
+        timeout { send_error "ssh ${cpe_ip} login timeout.\n"; exit 1; }
+    }
+    expect "#"
+    send  "7xcli_info|head -n 1\r"
+    #expect "7x"
+    interact
+}
+# expect eof
+
