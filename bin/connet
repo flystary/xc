@@ -5,12 +5,12 @@ set cpe_ip   [lindex $argv 1]
 set username [lindex $argv 2]
 set password [lindex $argv 3]
 
-#set J_PWD qweasdRF123
-set O_PWD Onetworks.c0M
-set X_PWD Xnetworks.c0M
+#set J_PWD qedasfFdss1i23
+set O_PWD Otwrks.c1M
+set X_PWD Xtwrks.c2M
 
 set timeout 6
-spawn ssh $username@master.jump.7x-networks.net  -p 2222
+spawn ssh $username@xx.xxx.xxxxx.net  -p 2222
 expect {
     #如果有yes/no关键字
     "yes/no" {
@@ -90,6 +90,6 @@ expect  {
     #如果上次输出结果有"*assword:"关键字，则输入密码
     "*assword:" { send "${X_PWD}\n" }  
 }
-send  "7xcli_info|head -n 1\r"
+send  "li_info|head -n 1\r"
 interact 
 # expect eof
