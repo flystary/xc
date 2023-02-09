@@ -20,20 +20,20 @@ pub struct Route {
 struct Valor {
     cpe: String,
     pop: String,
-    dvc: String,
+    dve: String,
     pse: String,
 }
 #[derive(Debug, Serialize, Deserialize)]
 struct Tassadar {
     pop: String,
     cpe: String,
-    dvc: String,
+    dve: String,
 }
 #[derive(Debug, Serialize, Deserialize)]
 struct Watsons {
     pop: String,
     cpe: String,
-    dvc: String,
+    dve: String,
     pse: String,
 }
 #[warn(non_camel_case_types)]
@@ -41,14 +41,14 @@ struct Watsons {
 struct WatsonsHa {
     cpe: String,
     pop: String,
-    dvc: String,
+    dve: String,
     pse: String,
 }
 #[derive(Debug, Serialize, Deserialize)]
 struct Nexus {
     pop: String,
     cpe: String,
-    dvc: String,
+    dve: String,
 }
 
 impl Route {
@@ -85,14 +85,14 @@ impl Route {
 
     pub fn get_dve_route(self, mode: &str) -> Option<String> {
         match mode {
-            "valor" => Some(format!("{}/valor/{}?", self.url, self.valor.dvc)),
-            "tassadar" => Some(format!("{}/tassadar/{}?", self.url, self.tassadar.dvc)),
+            "valor" => Some(format!("{}/valor/{}?", self.url, self.valor.dve)),
+            "tassadar" => Some(format!("{}/tassadar/{}?", self.url, self.tassadar.dve)),
             "watsons" => Some(format!(
                 "{}/watsons/{}?page=1&pageSize={}&",
-                self.url, self.watsons.dvc, self.watsons.pse
+                self.url, self.watsons.dve, self.watsons.pse
             )),
-            "watsonsha" => Some(format!("{}/watsons_ha/{}?", self.url, self.watsonsha.dvc)),
-            "nexus" => Some(format!("{}/nexus/{}?", self.url, self.nexus.dvc)),
+            "watsonsha" => Some(format!("{}/watsons_ha/{}?", self.url, self.watsonsha.dve)),
+            "nexus" => Some(format!("{}/nexus/{}?", self.url, self.nexus.dve)),
             _ => None,
         }
     }

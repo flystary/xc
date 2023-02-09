@@ -15,23 +15,23 @@ modes:
 valor:
     cpe: business/cpes
     pop: vpn/entries
-    dvc: device/cpes
+    dve: device/cpes
     pse: 1000
 tassadar:
     cpe: business/cpes
     pop: vpn/pops
-    dvc: device/cpes
+    dve: device/cpes
 watsons:
     cpe: nexus/business/boxes
     pop: nexus/openvpn/entries
-    dvc: nexus/device/boxes
+    dve: nexus/device/boxes
     pse: 4500
 watsonsha:
     cpe: nexus/business/boxes
     pop: nexus/openvpn/entries
-    dvc: nexus/device/boxes
+    dve: nexus/device/boxes
     pse: 120
 nexus:
     cpe: business/boxes
     pop: vpn/entries
-    dvc: device/boxes
+    dve: device/boxes
