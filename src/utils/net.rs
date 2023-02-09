@@ -374,7 +374,7 @@ pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
            }
        }
     }
-    println!("{}", enterprise);
+
     Some(Ucpe {
         sn,
         model,

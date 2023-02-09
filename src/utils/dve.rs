@@ -12,7 +12,6 @@ pub async fn get_dve_text(base: String) -> String {
     let url = format!(
         "{}access_token={}&_={}",
         base,
-        //super::init::TOKEN.to_string(),
         *super::init::TOKEN,
         super::tools::get_unixtime(),
     );
