@@ -14,12 +14,10 @@ pub trait Dis {
 impl Dis for Ucpes {
     fn display(&self) {
         let table = Table::new(self)
-            //.with(Style::GITHUB_MARKDOWN)
-            //.with(Style::noborder())
             .with(Style::NO_BORDER)
             .with(Modify::new(Full).with(Indent::new(1, 1, 0, 0)))
             .with(Modify::new(Head).with(Alignment::center_horizontal()))
-            .with(Modify::new(Row(1..)).with(Alignment::center_horizontal()))
+            .with(Modify::new(Row(1..)).with(Alignment::left()))
             .with(Modify::new(Row(0..1)).with(Format(|s| s.to_uppercase())))
             .with(Modify::new(Row(1..)).with(Format(|s| s.to_string())));
 
