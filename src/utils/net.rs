@@ -69,7 +69,9 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
         let mut sn = String::new();
         let mut model = String::new();
         let mut version = String::new();
-        let mut remoteport = String::new();
+        let mut port = String::new();
+        let mut enterprise = String::new();
+        let mut alias = String::new();
 
         let mut updatetime  = String::new();
         let mut masterpopip = String::new();
@@ -87,6 +89,9 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                 }
                 if let Value::String(v) = &cpe["softwareVersion"] {
                     version = v.to_string();
+                }
+                 if let Value::String(a) = &cpe["alias"] {
+                    alias = a.to_string();
                 }
                 //updatetime
                 match mode {
@@ -152,9 +157,22 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
         for device in &dves {
             if device["sn"] == *cpesn {
                 if let Value::Number(p) = &device["serverPort"] {
-                    remoteport = p.to_string();
-                    break;
+                    port = p.to_string();
+                    //break;
                 }
+                match mode {
+                    "watsons" => {
+                         enterprise = "watsons".to_string();
+                    }
+                    "watsonsha" => {
+                         enterprise = "watsonsha".to_string();
+                    }
+                    _ => {
+                        if let Value::String(d) = &device["customer"]["name"] {
+                            enterprise = d.to_string();
+                        }
+                    }
+                }  
             }
         }
 
@@ -206,7 +224,9 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
             mastercpeip,
             backupcpeip,
             backuppopip,
-            remoteport,
+            port,
+            enterprise,
+            alias, 
         })
     }
     Some(ucpes)
@@ -221,7 +241,10 @@ pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
     let mut sn = String::new();
     let mut model = String::new();
     let mut version = String::new();
-    let mut remoteport = String::new();
+    let mut port = String::new();
+    let mut enterprise = String::new();
+    let mut alias = String::new();
+
 
     let mut updatetime  = String::new();
     let mut masterpopip = String::new();
@@ -244,6 +267,9 @@ pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
     }
     if let Value::String(v) = &cpe["softwareVersion"] {
         version = v.to_string();
+    }
+    if let Value::String(a) = &cpe["alias"] {
+        alias = a.to_string();
     }
     //updatetime
     match mode {
@@ -332,9 +358,23 @@ pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
     }
     if let Some(device) = get_dve(mode, cpesn).await {
         if let Value::Number(p) = &device["serverPort"] {
-            remoteport = p.to_string();
+            port = p.to_string();
         }
+        match mode {
+            "watsons" => {
+                enterprise = "watsons".to_string();
+            }
+            "watsonsha" => {
+                enterprise = "watsonsha".to_string();
+            }
+            _ => {
+                if let Value::String(d) = &device["customer"]["name"] {
+                    enterprise = d.to_string();
+                }
+           }
+       }
     }
+    println!("{}", enterprise);
     Some(Ucpe {
         sn,
         model,
@@ -344,6 +384,8 @@ pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
         mastercpeip,
         backupcpeip,
         backuppopip,
-        remoteport,
+        port,
+        enterprise,
+        alias,
     })
 }

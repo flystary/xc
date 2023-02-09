@@ -16,7 +16,9 @@ pub struct Ucpe {
     pub(crate) mastercpeip: String,
     pub(crate) backuppopip: String,
     pub(crate) backupcpeip: String,
-    pub(crate) remoteport: String,
+    pub(crate) port:        String,
+    pub(crate) enterprise:  String,
+    pub(crate) alias:       String,
 }
 
 pub trait Dis {
@@ -29,6 +31,7 @@ impl Dis for Ucpe {
         let table = Table::new(vec![self])
             //.with(Style::GITHUB_MARKDOWN)
             .with(Style::ASCII)
+            // .with(Style::NO_BORDER)
             .with(Modify::new(Full).with(Indent::new(1, 1, 0, 0)))
             .with(Modify::new(Head).with(Alignment::center_horizontal()))
             .with(Modify::new(Row(1..)).with(Alignment::center_horizontal()))
