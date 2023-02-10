@@ -6,7 +6,7 @@ use std::process::Command;
 use tabled::{Alignment, Format, Full, Head, Indent, Modify, Row};
 use tabled::{Style, Table, Tabled};
 
-#[derive(Tabled)]
+#[derive(Tabled, Clone)]
 pub struct Ucpe {
     pub(crate) sn: String,
     pub(crate) model: String,
@@ -29,9 +29,12 @@ impl Dis for Ucpe {
     fn display(&self) {
         // let v = vec![self];
         let table = Table::new(vec![self])
+            //.with(Style::GITHUB_MARKDOWN)
             .with(Style::ASCII)
+            // .with(Style::NO_BORDER)
             .with(Modify::new(Full).with(Indent::new(1, 1, 0, 0)))
             .with(Modify::new(Head).with(Alignment::center_horizontal()))
+            //.with(Modify::new(Row(1..)).with(Alignment::center_horizontal()))
             .with(Modify::new(Row(1..)).with(Alignment::left()))
             .with(Modify::new(Row(0..1)).with(Format(|s| s.to_uppercase())))
             .with(Modify::new(Row(1..)).with(Format(|s| s.to_string())));

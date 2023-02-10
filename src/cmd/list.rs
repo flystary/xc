@@ -37,8 +37,9 @@ pub async fn run(args: &ArgMatches<'_>) {
         None => "valor",
     };
     println!("CPE {} is: {}", "Mode".blue().bold(), mode.bold());
-    if let Some(cpes) = get_cpes_by_sn_mode(mode, sns).await {
+   
+   if let Some(cpes) = get_cpes_by_sn_mode(mode, sns).await {
         // #[derive(Debug)]
         cpes.display()
-    }
+   }
 }
