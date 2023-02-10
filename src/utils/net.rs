@@ -48,8 +48,9 @@ pub async fn get_token_by_resp() -> Option<String> {
     None
 }
 
-async fn xxx(mode: String, mut cpes:Arc<Vec<Value>>, mut dves:Arc<Vec<Value>>, mut pops:Arc<Vec<Value>>,) {
-    tokio::spawn(async move {
+async fn handle(mode: String, mut cpes:Arc<Vec<Value>>, mut dves:Arc<Vec<Value>>, mut pops:Arc<Vec<Value>>,) {
+    
+    let handle = tokio::spawn(async move {
         if let Some(data) = get_cpes(&mode).await {
             cpes = Arc::new(data)
         }
@@ -63,6 +64,7 @@ async fn xxx(mode: String, mut cpes:Arc<Vec<Value>>, mut dves:Arc<Vec<Value>>, m
         }
         println!("get_pops");
     });
+    _ = tokio::join!(handle)
 }
 
 pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
@@ -75,9 +77,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
 
     //a
     
-    xxx(mode.to_string(), cpes.clone(), dves.clone(), pops.clone()).await;
-
-
+    handle(mode.to_string(), cpes.clone(), dves.clone(), pops.clone()).await;
     
     for cpesn in cpesns {
         let mut mid = 0;
