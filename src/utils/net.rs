@@ -33,23 +33,15 @@ pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwes
 }
 
 pub async fn get_token_by_resp() -> Option<String> {
-    let result = do_get_resp().await;
-    match result {
-        Ok(v) => {
-            if let Some(Value::String(token)) = v.get("access_token") {
-                return Some(token.to_string());
-            }
-        },
-        Err(e) => {
-            println!("get token error:{}", e);
-            return None
-        },
+    if let Ok(res) = do_get_resp().await {
+        if let Some(Value::String(token)) = res.get("access_token") {
+            return Some(token.to_string());
+        }
     }
     None
 }
 
 async fn handle(mode: String, mut cpes:Arc<Vec<Value>>, mut dves:Arc<Vec<Value>>, mut pops:Arc<Vec<Value>>,) {
-    
     let handle = tokio::spawn(async move {
         if let Some(data) = get_cpes(&mode).await {
             cpes = Arc::new(data)
@@ -68,17 +60,15 @@ async fn handle(mode: String, mut cpes:Arc<Vec<Value>>, mut dves:Arc<Vec<Value>>
 }
 
 pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
-    
+
     let mut ucpes:Vec<Ucpe> = Vec::new(); //table
 
     let mut cpes: Arc<Vec<Value>> = Arc::new(Vec::new()); //http
     let mut dves = Arc::new(Vec::new()); //http
     let mut pops = Arc::new(Vec::new()); //http
 
-    //a
-    
     handle(mode.to_string(), cpes.clone(), dves.clone(), pops.clone()).await;
-    
+
     for cpesn in cpesns {
         let mut mid = 0;
         let mut bid = 0;
@@ -192,7 +182,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                             enterprise = d.to_string();
                         }
                     }
-                }  
+                }
             }
         }
 
@@ -248,7 +238,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
             backuppopip,
             port,
             enterprise,
-            alias, 
+            alias,
         };
 
         ucpes.push(uu)
