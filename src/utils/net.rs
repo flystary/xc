@@ -2,6 +2,8 @@ use crate::utils::cpe::*;
 use crate::utils::dve::*;
 use crate::utils::pop::*;
 
+use futures::executor::block_on;
+
 #[warn(unused_imports)]
 use serde_json::Value;
 use std::collections::HashMap;
@@ -31,18 +33,11 @@ pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwes
         .await
 }
 
-pub async fn get_token_by_resp() -> Option<String> {
-    let result = do_get_resp().await;
-    match result {
-        Ok(v) => {
-            if let Some(Value::String(token)) = v.get("access_token") {
-                return Some(token.to_string());
-            }
-        },
-        Err(e) => {
-            println!("get token error:{}", e);
-            return None
-        },
+pub fn get_token_by_resp() -> Option<String> {
+    if let Ok(res) = block_on(do_get_resp()) {
+        if let Some(Value::String(token)) = res.get("access_token") {
+            return Some(token.to_string());
+        }
     }
     None
 }

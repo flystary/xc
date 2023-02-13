@@ -4,7 +4,7 @@ use anyhow::Result;
 use std::path::{Path, PathBuf};
 
 use lazy_static::lazy_static;
-use futures::executor::block_on;
+
 
 pub fn get_default_config(conf: &str) -> Result<PathBuf> {
     let paths = [
@@ -39,7 +39,7 @@ pub fn init_route() -> Route {
 lazy_static! {
     pub static ref TOKEN: String = {
         let mut token = String::new();
-        if let Some(s) = block_on(super::net::get_token_by_resp()) {
+        if let Some(s) = super::net::get_token_by_resp() {
             token = s
         }
         token
