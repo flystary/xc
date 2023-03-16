@@ -28,7 +28,5 @@ async fn run() {
 
 #[tokio::main]
 async fn main() {
-    tokio::spawn(async {
-        run().await;
-    });
+    run().await;
 }

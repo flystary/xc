@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 
 use lazy_static::lazy_static;
 
+pub static mut TOKEN: String = "".to_string();
 
 pub fn get_default_config(conf: &str) -> Result<PathBuf> {
     let paths = [
@@ -36,12 +37,8 @@ pub fn init_route() -> Route {
     load_route(init_conf().sys.path)
 }
 
-lazy_static! {
-    pub static ref TOKEN: String = {
-        let mut token = String::new();
-        if let Some(s) = super::net::get_token_by_resp() {
-            token = s
-        }
-        token
-    };
+pub async fn init_token() {
+    if let Some(s) = super::net::get_token_by_resp().await {
+        TOKEN = s
+    }
 }
