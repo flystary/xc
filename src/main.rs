@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate clap;
-extern crate lazy_static;
 mod cmd;
 mod load;
 mod utils;

@@ -5,7 +5,6 @@ use crate::utils::pop::*;
 #[warn(unused_imports)]
 use serde_json::Value;
 use std::collections::HashMap;
-use std::sync::Arc;
 
 use tokio::task;
 use tokio::runtime::Runtime;
@@ -13,28 +12,28 @@ use super::init::init_conf;
 use super::ucpe::Ucpe;
 use super::ucpes::Ucpes;
 
-static mut CPES: Option<Vec<Value>> = None;
-static mut POPS: Option<Vec<Value>> = None;
-static mut DVES: Option<Vec<Value>> = None;
+static mut CPES: Vec<Value> = Vec::new();
+static mut POPS: Vec<Value> = Vec::new();
+static mut DVES: Vec<Value> = Vec::nwe();
 
 async fn handle(mode: &str) {
-    
+
     let rt = Runtime::new().unwrap();
     let task1 = task::spawn(async move {
         if let Some(data) = get_cpes(&mode).await {
-            CPES = Some(data)
+            CPES = data
         }
     });
 
     let task2 = task::spawn(async move {
         if let Some(data) = get_pops(&mode).await {
-            POPS = Some(data)
+            POPS = data
         }
     });
 
     let task3 = task::spawn(async move {
         if let Some(data) = get_dves(&mode).await {
-            DVES = Some(data)
+            DVES = data
         }
     });
 
@@ -79,7 +78,9 @@ pub async fn get_token_by_resp() -> Option<String> {
 pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
 
     let mut ucpes:Vec<Ucpe> = Vec::new(); //table
+
     handle(mode).await;
+
     for cpesn in cpesns {
         let mut mid = 0;
         let mut bid = 0;
@@ -96,7 +97,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
         let mut backuppopip = String::new();
         let mut backupcpeip = String::new();
 
-        for cpe in CPES {
+        for cpe in &CPES {
             if cpe["sn"] == *cpesn {
                 if let Value::String(s) = &cpe["sn"] {
                     sn = s.to_string();
@@ -171,7 +172,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
             }
         }
 
-        for device in DVES {
+        for device in &DVES {
             if device["sn"] == *cpesn {
                 if let Value::Number(p) = &device["serverPort"] {
                     port = p.to_string();
@@ -194,7 +195,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
         }
         match mode {
             "valor" => {
-                for pop in POPS {
+                for pop in &POPS {
                     if pop["id"] == mid {
                         if let Value::String(m) = &pop["popIp"] {
                             masterpopip = m.to_string();
@@ -202,7 +203,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                         }
                     }
                 }
-                for pop in POPS {
+                for pop in &POPS {
                     if pop["id"] == bid {
                         if let Value::String(m) = &pop["popIp"] {
                             backuppopip = m.to_string();
@@ -212,7 +213,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                 }
             }
             _ => {
-                for pop in POPS {
+                for pop in &POPS {
                     if pop["id"] == mid {
                         if let Value::String(m) = &pop["entryIp"] {
                             masterpopip = m.to_string();
@@ -220,7 +221,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                         }
                     }
                 }
-                for pop in POPS {
+                for pop in &POPS {
                     if pop["id"] == bid {
                         if let Value::String(m) = &pop["entryIp"] {
                             backuppopip = m.to_string();

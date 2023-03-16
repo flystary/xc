@@ -1469,7 +1469,6 @@ dependencies = [
  "clap",
  "colored",
  "futures",
- "lazy_static",
  "reqwest",
  "rust-crypto",
  "serde",

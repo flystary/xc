@@ -3,8 +3,6 @@ use crate::load::route::{load_route, Route};
 use anyhow::Result;
 use std::path::{Path, PathBuf};
 
-use lazy_static::lazy_static;
-
 pub static mut TOKEN: String = "".to_string();
 
 pub fn get_default_config(conf: &str) -> Result<PathBuf> {
