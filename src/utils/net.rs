@@ -117,21 +117,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                 }
                 // master/backup
                 match mode {
-                    "valor" => {
-                        if let Value::String(m) = &cpe["masterPopIp"] {
-                            mastercpeip = m.to_string();
-                        }
-                        if let Value::String(b) = &cpe["backupPopIp"] {
-                            backupcpeip = b.to_string();
-                        }
-                        if let Value::Number(id) = &cpe["masterPopId"] {
-                            mid = id.as_i64().unwrap();
-                        }
-                        if let Value::Number(id) = &cpe["backupPopId"] {
-                            bid = id.as_i64().unwrap();
-                        }
-                    }
-                    "tassadar" => {
+                    "valor" | "tassadar" => {
                         if let Value::String(m) = &cpe["masterPopIp"] {
                             mastercpeip = m.to_string();
                         }
@@ -301,21 +287,7 @@ pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
     }
     // master/backup
     match mode {
-        "valor" => {
-            if let Value::String(m) = &cpe["masterPopIp"] {
-                mastercpeip = m.to_string();
-            }
-            if let Value::String(b) = &cpe["backupPopIp"] {
-                backupcpeip = b.to_string();
-            }
-            if let Value::Number(id) = &cpe["masterPopId"] {
-                mid = id.as_i64().unwrap();
-            }
-            if let Value::Number(id) = &cpe["backupPopId"] {
-                bid = id.as_i64().unwrap();
-            }
-        }
-        "tassadar" => {
+        "valor" | "tassadar" => {
             if let Value::String(m) = &cpe["masterPopIp"] {
                 mastercpeip = m.to_string();
             }
