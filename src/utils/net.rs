@@ -2,16 +2,48 @@ use crate::utils::cpe::*;
 use crate::utils::dve::*;
 use crate::utils::pop::*;
 
-use futures::executor::block_on;
 #[warn(unused_imports)]
 use serde_json::Value;
 use std::collections::HashMap;
-use std::sync::Arc;
 
+use tokio::task;
+use tokio::runtime::Runtime;
 use super::init::init_conf;
 use super::ucpe::Ucpe;
 use super::ucpes::Ucpes;
 
+static mut CPES: Vec<Value> = Vec::new();
+static mut POPS: Vec<Value> = Vec::new();
+static mut DVES: Vec<Value> = Vec::nwe();
+
+async fn handle(mode: &str) {
+
+    let rt = Runtime::new().unwrap();
+    let task1 = task::spawn(async move {
+        if let Some(data) = get_cpes(&mode).await {
+            CPES = data
+        }
+    });
+
+    let task2 = task::spawn(async move {
+        if let Some(data) = get_pops(&mode).await {
+            POPS = data
+        }
+    });
+
+    let task3 = task::spawn(async move {
+        if let Some(data) = get_dves(&mode).await {
+            DVES = data
+        }
+    });
+
+    tokio::select! {
+        _ = task1 => {},
+        _ = task2 => {},
+        _ = task3 => {},
+        _ = tokio::task::spawn_blocking(||super::init::init_token()).await.unwrap() => {},
+    }
+}
 
 pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::Error> {
     let sys = init_conf().sys;
@@ -33,8 +65,8 @@ pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwes
         .await
 }
 
-pub fn get_token_by_resp() -> Option<String> {
-    if let Ok(res) = block_on(do_get_resp()) {
+pub async fn get_token_by_resp() -> Option<String> {
+    if let Ok(res) = do_get_resp().await {
         if let Some(Value::String(token)) = res.get("access_token") {
             return Some(token.to_string());
         }
@@ -42,33 +74,12 @@ pub fn get_token_by_resp() -> Option<String> {
     None
 }
 
-async fn handle(mode: String, mut cpes:Arc<Vec<Value>>, mut dves:Arc<Vec<Value>>, mut pops:Arc<Vec<Value>>,) {
-    let handle = tokio::spawn(async move {
-        if let Some(data) = get_cpes(&mode).await {
-            cpes = Arc::new(data)
-        }
-        println!("get_cpes");
-        if let Some(data) = get_dves(&mode).await {
-            dves = Arc::new(data)
-        }
-        println!("get_dves");
-        if let Some(data) = get_pops(&mode).await {
-            pops = Arc::new(data)
-        }
-        println!("get_pops");
-    });
-    _ = tokio::join!(handle)
-}
 
 pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
 
     let mut ucpes:Vec<Ucpe> = Vec::new(); //table
 
-    let mut cpes: Arc<Vec<Value>> = Arc::new(Vec::new()); //http
-    let mut dves = Arc::new(Vec::new()); //http
-    let mut pops = Arc::new(Vec::new()); //http
-
-    handle(mode.to_string(), cpes.clone(), dves.clone(), pops.clone()).await;
+    handle(mode).await;
 
     for cpesn in cpesns {
         let mut mid = 0;
@@ -86,9 +97,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
         let mut backuppopip = String::new();
         let mut backupcpeip = String::new();
 
-        let ref xx = *cpes.clone();
-
-        for cpe in xx {
+        for cpe in &CPES {
             if cpe["sn"] == *cpesn {
                 if let Value::String(s) = &cpe["sn"] {
                     sn = s.to_string();
@@ -149,9 +158,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
             }
         }
 
-        let ref local_dves = *dves.clone();
-
-        for device in local_dves {
+        for device in &DVES {
             if device["sn"] == *cpesn {
                 if let Value::Number(p) = &device["serverPort"] {
                     port = p.to_string();
@@ -172,12 +179,9 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                 }
             }
         }
-
-        let ref local_pop = *pops.clone();
-
         match mode {
             "valor" => {
-                for pop in local_pop {
+                for pop in &POPS {
                     if pop["id"] == mid {
                         if let Value::String(m) = &pop["popIp"] {
                             masterpopip = m.to_string();
@@ -185,7 +189,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                         }
                     }
                 }
-                for pop in local_pop{
+                for pop in &POPS {
                     if pop["id"] == bid {
                         if let Value::String(m) = &pop["popIp"] {
                             backuppopip = m.to_string();
@@ -195,7 +199,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                 }
             }
             _ => {
-                for pop in local_pop{
+                for pop in &POPS {
                     if pop["id"] == mid {
                         if let Value::String(m) = &pop["entryIp"] {
                             masterpopip = m.to_string();
@@ -203,7 +207,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                         }
                     }
                 }
-                for pop in local_pop {
+                for pop in &POPS {
                     if pop["id"] == bid {
                         if let Value::String(m) = &pop["entryIp"] {
                             backuppopip = m.to_string();

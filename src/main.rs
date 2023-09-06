@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate clap;
-extern crate lazy_static;
 mod cmd;
 mod load;
 mod utils;
@@ -28,7 +27,5 @@ async fn run() {
 
 #[tokio::main]
 async fn main() {
-    tokio::spawn(async {
-        run().await;
-    });
+    run().await;
 }
