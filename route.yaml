@@ -1,8 +1,7 @@
 %YAML 1.1
 ---
 
-url: http://xxxxx.xxx.net/xxx
-token: oauth/token
+initurl: http://xxxxx.xxx.net/xxx
 operation: operation/boxes
 
 modes:
@@ -14,9 +13,9 @@ modes:
 
 valor:
     cpe: business/cpes
-    pop: vpn/entries
+    pop: vpn/pops
     dve: device/cpes
-    pse: 1000
+    pse: 1800
 tassadar:
     cpe: business/cpes
     pop: vpn/pops
@@ -25,7 +24,7 @@ watsons:
     cpe: nexus/business/boxes
     pop: nexus/openvpn/entries
     dve: nexus/device/boxes
-    pse: 4500
+    pse: 4800
 watsonsha:
     cpe: nexus/business/boxes
     pop: nexus/openvpn/entries

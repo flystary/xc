@@ -6,8 +6,7 @@ use std::io::prelude::*;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Route {
-    pub url: String,
-    pub token: String,
+    pub initurl: String,
     pub operation: String,
     modes: Vec<String>,
     valor: Valor,
@@ -56,43 +55,43 @@ impl Route {
         match mode {
             "valor" => Some(format!(
                 "{}/valor/{}?page=1&pageSize={}&",
-                self.url, self.valor.cpe, self.valor.pse
+                self.initurl, self.valor.cpe, self.valor.pse
             )),
             "watsons" => Some(format!(
                 "{}/watsons/{}?page=1&pageSize={}&",
-                self.url, self.watsons.cpe, self.watsons.pse
+                self.initurl, self.watsons.cpe, self.watsons.pse
             )),
             "watsonsha" => Some(format!(
                 "{}/watsons_ha/{}?page=1&pageSize={}&",
-                self.url, self.watsonsha.cpe, self.watsonsha.pse
+                self.initurl, self.watsonsha.cpe, self.watsonsha.pse
             )),
-            "tassadar" => Some(format!("{}/tassadar/{}?", self.url, self.tassadar.cpe)),
-            "nexus" => Some(format!("{}/nexus/{}?", self.url, self.nexus.cpe)),
+            "tassadar" => Some(format!("{}/tassadar/{}?", self.initurl, self.tassadar.cpe)),
+            "nexus" => Some(format!("{}/nexus/{}?", self.initurl, self.nexus.cpe)),
             _ => None,
         }
     }
 
     pub fn get_pop_route(self, mode: &str) -> Option<String> {
         match mode {
-            "valor" => Some(format!("{}/valor/{}", self.url, self.valor.pop)),
-            "tassadar" => Some(format!("{}/tassadar/{}", self.url, self.tassadar.pop)),
-            "watsons" => Some(format!("{}/watsons/{}", self.url, self.watsons.pop)),
-            "watsonsha" => Some(format!("{}/watsons_ha/{}", self.url, self.watsonsha.pop)),
-            "nexus" => Some(format!("{}/nexus/{}", self.url, self.nexus.pop)),
+            "valor" => Some(format!("{}/valor/{}", self.initurl, self.valor.pop)),
+            "tassadar" => Some(format!("{}/tassadar/{}", self.initurl, self.tassadar.pop)),
+            "watsons" => Some(format!("{}/watsons/{}", self.initurl, self.watsons.pop)),
+            "watsonsha" => Some(format!("{}/watsons_ha/{}", self.initurl, self.watsonsha.pop)),
+            "nexus" => Some(format!("{}/nexus/{}", self.initurl, self.nexus.pop)),
             _ => None,
         }
     }
 
     pub fn get_dve_route(self, mode: &str) -> Option<String> {
         match mode {
-            "valor" => Some(format!("{}/valor/{}?", self.url, self.valor.dve)),
-            "tassadar" => Some(format!("{}/tassadar/{}?", self.url, self.tassadar.dve)),
+            "valor" => Some(format!("{}/valor/{}?", self.initurl, self.valor.dve)),
+            "tassadar" => Some(format!("{}/tassadar/{}?", self.initurl, self.tassadar.dve)),
             "watsons" => Some(format!(
                 "{}/watsons/{}?page=1&pageSize={}&",
-                self.url, self.watsons.dve, self.watsons.pse
+                self.initurl, self.watsons.dve, self.watsons.pse
             )),
-            "watsonsha" => Some(format!("{}/watsons_ha/{}?", self.url, self.watsonsha.dve)),
-            "nexus" => Some(format!("{}/nexus/{}?", self.url, self.nexus.dve)),
+            "watsonsha" => Some(format!("{}/watsons_ha/{}?", self.initurl, self.watsonsha.dve)),
+            "nexus" => Some(format!("{}/nexus/{}?", self.initurl, self.nexus.dve)),
             _ => None,
         }
     }
