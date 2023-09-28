@@ -153,10 +153,9 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                             enterprise = d.to_string();
                         }
                     }
-                }  
+                }
             }
         }
-
         match mode {
             "valor" => {
                 for pop in &pops {
@@ -207,7 +206,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
             backuppopip,
             port,
             enterprise,
-            alias, 
+            alias,
         })
     }
     Some(ucpes)
