@@ -81,6 +81,7 @@ impl Con for Ucpe {
         if cfg!(target_os = "linux") {
             if self.model.as_str() == "7XEC2000-260" || self.model.as_str() == "7XEC2000-100" {
                 Command::new("/usr/bin/expect")
+                    .env("LC_CTYPE", "en_US")
                     .arg("/etc/xc/bin/connet")
                     .arg(&self.masterpopip)
                     .arg(&self.mastercpeip)
@@ -92,6 +93,7 @@ impl Con for Ucpe {
                 return;
             }
             Command::new("/usr/bin/expect")
+                .env("LC_CTYPE", "en_US")
                 .arg("/etc/xc/bin/connet")
                 .arg(&self.masterpopip)
                 .arg(&self.mastercpeip)
@@ -118,6 +120,7 @@ impl Con for Ucpe {
         if cfg!(target_os = "linux") {
             if self.model.as_str() == "7XEC2000-260" || self.model.as_str() == "7XEC2000-100" {
                 Command::new("/usr/bin/expect")
+                    .env("LC_CTYPE", "en_US")
                     .arg("/etc/xc/bin/connet")
                     .arg(&self.backuppopip)
                     .arg(&self.backupcpeip)
@@ -129,6 +132,7 @@ impl Con for Ucpe {
                 return;
             }
             Command::new("/usr/bin/expect")
+                .env("LC_CTYPE", "en_US")
                 .arg("/etc/xc/bin/connet")
                 .arg(&self.backuppopip)
                 .arg(&self.backupcpeip)
