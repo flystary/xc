@@ -20,7 +20,7 @@ pub fn subcommand<'a, 'b>() -> App<'a, 'b> {
                 .long("mode")
                 .takes_value(true)
                 .possible_value("valor")
-                .possible_value("nexus")
+                .possible_value("yifeng")
                 .possible_value("watsons")
                 .possible_value("tassadar")
                 .possible_value("watsonsha")

@@ -103,7 +103,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
                 }
                 // master/backup
                 match mode {
-                    "valor" | "tassadar" => {
+                    "valor" | "yifeng" |"tassadar" => {
                         if let Value::String(m) = &cpe["masterPopIp"] {
                             mastercpeip = m.to_string();
                         }
@@ -157,7 +157,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
             }
         }
         match mode {
-            "valor" => {
+            "valor" | "yifeng" => {
                 for pop in &pops {
                     if pop["id"] == mid {
                         if let Value::String(m) = &pop["popIp"] {
@@ -266,7 +266,7 @@ pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
     }
     // master/backup
     match mode {
-        "valor" | "tassadar" => {
+        "valor" | "tassadar" | "yifeng" => {
             if let Value::String(m) = &cpe["masterPopIp"] {
                 mastercpeip = m.to_string();
             }
@@ -297,7 +297,7 @@ pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
     }
 
     match mode {
-        "valor" | "tassadar" => {
+        "valor" | "tassadar" | "yifeng" => {
             if let Some(p) = get_pop(mode, mid).await {
                 if let Value::String(m) = &p["popIp"] {
                     masterpopip = m.to_string();

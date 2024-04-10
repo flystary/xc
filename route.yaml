@@ -7,7 +7,7 @@ operation: operation/boxes
 modes:
   - valor
   - tassadar
-  - nexus
+  - yifeng
   - watsons
   - watsonsha
 
@@ -20,6 +20,11 @@ tassadar:
     cpe: business/cpes
     pop: vpn/pops
     dve: device/cpes
+yifeng:
+    cpe: business/cpes
+    pop: vpn/pops
+    dve: device/cpes
+    pse: 1000
 watsons:
     cpe: nexus/business/boxes
     pop: nexus/openvpn/entries
@@ -30,8 +35,4 @@ watsonsha:
     pop: nexus/openvpn/entries
     dve: nexus/device/boxes
     pse: 120
-nexus:
-    cpe: business/boxes
-    pop: vpn/entries
-    dve: device/boxes
 

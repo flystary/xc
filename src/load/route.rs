@@ -11,7 +11,7 @@ pub struct Route {
     modes: Vec<String>,
     valor: Valor,
     tassadar: Tassadar,
-    nexus: Nexus,
+    yifeng: Valor,
     watsons: Watsons,
     watsonsha: WatsonsHa,
 }
@@ -43,12 +43,6 @@ struct WatsonsHa {
     dve: String,
     pse: String,
 }
-#[derive(Debug, Serialize, Deserialize)]
-struct Nexus {
-    pop: String,
-    cpe: String,
-    dve: String,
-}
 
 impl Route {
     pub fn get_cpe_route(self, mode: &str) -> Option<String> {
@@ -56,6 +50,10 @@ impl Route {
             "valor" => Some(format!(
                 "{}/valor/{}?page=1&pageSize={}&",
                 self.initurl, self.valor.cpe, self.valor.pse
+            )),
+            "yifeng" => Some(format!(
+                "{}/yifeng/valor/{}?page=1&pageSize={}&",
+                self.initurl, self.yifeng.cpe, self.yifeng.pse
             )),
             "watsons" => Some(format!(
                 "{}/watsons/{}?page=1&pageSize={}&",
@@ -66,7 +64,6 @@ impl Route {
                 self.initurl, self.watsonsha.cpe, self.watsonsha.pse
             )),
             "tassadar" => Some(format!("{}/tassadar/{}?", self.initurl, self.tassadar.cpe)),
-            "nexus" => Some(format!("{}/nexus/{}?", self.initurl, self.nexus.cpe)),
             _ => None,
         }
     }
@@ -74,10 +71,10 @@ impl Route {
     pub fn get_pop_route(self, mode: &str) -> Option<String> {
         match mode {
             "valor" => Some(format!("{}/valor/{}", self.initurl, self.valor.pop)),
+            "yifeng" => Some(format!("{}/yifeng/valor/{}", self.initurl, self.yifeng.pop)),
             "tassadar" => Some(format!("{}/tassadar/{}", self.initurl, self.tassadar.pop)),
             "watsons" => Some(format!("{}/watsons/{}", self.initurl, self.watsons.pop)),
             "watsonsha" => Some(format!("{}/watsons_ha/{}", self.initurl, self.watsonsha.pop)),
-            "nexus" => Some(format!("{}/nexus/{}", self.initurl, self.nexus.pop)),
             _ => None,
         }
     }
@@ -85,13 +82,13 @@ impl Route {
     pub fn get_dve_route(self, mode: &str) -> Option<String> {
         match mode {
             "valor" => Some(format!("{}/valor/{}?", self.initurl, self.valor.dve)),
+            "yifeng" => Some(format!("{}/yifeng/valor/{}?", self.initurl, self.yifeng.dve)),
             "tassadar" => Some(format!("{}/tassadar/{}?", self.initurl, self.tassadar.dve)),
             "watsons" => Some(format!(
                 "{}/watsons/{}?page=1&pageSize={}&",
                 self.initurl, self.watsons.dve, self.watsons.pse
             )),
             "watsonsha" => Some(format!("{}/watsons_ha/{}?", self.initurl, self.watsonsha.dve)),
-            "nexus" => Some(format!("{}/nexus/{}?", self.initurl, self.nexus.dve)),
             _ => None,
         }
     }
