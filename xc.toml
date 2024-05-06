@@ -1,4 +1,5 @@
 [sys]
+id   = "internal"
 path = "/etc/xc/route.yaml"
 secret = ""
 loginurl = ""

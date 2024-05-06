@@ -6,6 +6,7 @@ pub fn get_unixtime() -> i64 {
     times.sec * 1000 + (times.nsec as f64 / 1000.0 / 1000.0) as i64
 }
 
+#[warn(dead_code)]
 pub fn md5<S: Into<String>>(input: S) -> String {
     let mut md5 = Md5::new();
     md5.input_str(&input.into());

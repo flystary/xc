@@ -17,10 +17,12 @@ pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwes
     let sys = init_conf().sys;
     let client = reqwest::Client::new();
     let url = format!(
-        "{}/matrix/oauth/token?client_id=browser&client_secret={}&grant_type=password&password={}&username={}",
+        "{}/matrix/oauth/token?client_id={}&client_secret={}&grant_type=password&password={}&username={}",
         sys.loginurl,
+        sys.id,
         sys.secret,
-        super::tools::md5(super::tools::md5(sys.password)),
+        sys.password,
+        // super::tools::md5(super::tools::md5(sys.password)),
         sys.username
     );
 
