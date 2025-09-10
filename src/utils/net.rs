@@ -1,50 +1,40 @@
-use crate::utils::cpe::*;
-use crate::utils::dve::*;
-use crate::utils::pop::*;
-
-#[warn(unused_imports)]
+use crate::utils::{cpe::*, dve::*, pop::*};
 use serde_json::Value;
 use std::collections::HashMap;
 
+use once_cell::sync::Lazy;
+use tokio::sync::RwLock;
 use tokio::task;
-use tokio::runtime::Runtime;
+
 use super::init::init_conf;
 use super::ucpe::Ucpe;
 use super::ucpes::Ucpes;
 
-static mut CPES: Vec<Value> = Vec::new();
-static mut POPS: Vec<Value> = Vec::new();
-static mut DVES: Vec<Value> = Vec::nwe();
+/// 全局共享状态（线程安全）
+pub static CPES: Lazy<RwLock<Vec<Value>>> = Lazy::new(|| RwLock::new(Vec::new()));
+pub static POPS: Lazy<RwLock<Vec<Value>>> = Lazy::new(|| RwLock::new(Vec::new()));
+pub static DVES: Lazy<RwLock<Vec<Value>>> = Lazy::new(|| RwLock::new(Vec::new()));
 
 async fn handle(mode: &str) {
+    let (cpes, pops, dves, _) = tokio::join!(
+        get_cpes(mode),
+        get_pops(mode),
+        get_dves(mode),
+        task::spawn_blocking(|| super::init::init_token())
+    );
 
-    let rt = Runtime::new().unwrap();
-    let task1 = task::spawn(async move {
-        if let Some(data) = get_cpes(&mode).await {
-            CPES = data
-        }
-    });
-
-    let task2 = task::spawn(async move {
-        if let Some(data) = get_pops(&mode).await {
-            POPS = data
-        }
-    });
-
-    let task3 = task::spawn(async move {
-        if let Some(data) = get_dves(&mode).await {
-            DVES = data
-        }
-    });
-
-    tokio::select! {
-        _ = task1 => {},
-        _ = task2 => {},
-        _ = task3 => {},
-        _ = tokio::task::spawn_blocking(||super::init::init_token()).await.unwrap() => {},
+    if let Some(data) = cpes {
+        *CPES.write().await = data;
+    }
+    if let Some(data) = pops {
+        *POPS.write().await = data;
+    }
+    if let Some(data) = dves {
+        *DVES.write().await = data;
     }
 }
 
+/// 请求认证服务器获取 token 响应
 pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwest::Error> {
     let sys = init_conf().sys;
     let client = reqwest::Client::new();
@@ -57,168 +47,147 @@ pub async fn do_get_resp() -> Result<HashMap<std::string::String, Value>, reqwes
     );
 
     client
-        .post(url.as_str())
+        .post(url)
         .send()
-        .await
-        .unwrap()
+        .await?
         .json::<HashMap<String, Value>>()
         .await
 }
 
+/// 从响应中提取 token
 pub async fn get_token_by_resp() -> Option<String> {
-    if let Ok(res) = do_get_resp().await {
-        if let Some(Value::String(token)) = res.get("access_token") {
-            return Some(token.to_string());
-        }
-    }
-    None
+    do_get_resp().await.ok().and_then(|res| {
+        res.get("access_token")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string())
+    })
 }
 
+/// 获取 CPES 的只读副本
+pub async fn get_cpes_data() -> Vec<Value> {
+    CPES.read().await.clone()
+}
 
+/// 获取 POPS 的只读副本
+pub async fn get_pops_data() -> Vec<Value> {
+    POPS.read().await.clone()
+}
+
+/// 获取 DVES 的只读副本
+pub async fn get_dves_data() -> Vec<Value> {
+    DVES.read().await.clone()
+}
+
+/// 根据 SN 列表和 mode 获取 Ucpes
 pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes> {
-
-    let mut ucpes:Vec<Ucpe> = Vec::new(); //table
-
+    // 确保数据最新
     handle(mode).await;
 
-    for cpesn in cpesns {
-        let mut mid = 0;
-        let mut bid = 0;
+    let cpes = CPES.read().await.clone();
+    let pops = POPS.read().await.clone();
+    let dves = DVES.read().await.clone();
+
+    let mut ucpes: Ucpes = Vec::new();
+
+    // 预构建 pop 映射，加速查找
+    let mut pop_map = HashMap::new();
+    for pop in pops {
+        if let Some(id) = pop["id"].as_i64() {
+            pop_map.insert(id, pop);
+        }
+    }
+
+    // 遍历目标 SN
+    for sn_filter in cpesns {
         let mut sn = String::new();
         let mut model = String::new();
         let mut version = String::new();
         let mut port = String::new();
         let mut enterprise = String::new();
         let mut alias = String::new();
-
-        let mut updatetime  = String::new();
+        let mut updatetime = String::new();
         let mut masterpopip = String::new();
         let mut mastercpeip = String::new();
         let mut backuppopip = String::new();
         let mut backupcpeip = String::new();
+        let mut mid: i64 = 0;
+        let mut bid: i64 = 0;
 
-        for cpe in &CPES {
-            if cpe["sn"] == *cpesn {
-                if let Value::String(s) = &cpe["sn"] {
-                    sn = s.to_string();
+        // ---- 查找 CPE ----
+        if let Some(cpe) = cpes.iter().find(|c| c["sn"].as_str() == Some(sn_filter)) {
+            sn = cpe["sn"].as_str().unwrap_or_default().to_string();
+            model = cpe["model"].as_str().unwrap_or_default().to_string();
+            version = cpe["softwareVersion"]
+                .as_str()
+                .unwrap_or_default()
+                .to_string();
+            alias = cpe["alias"].as_str().unwrap_or_default().to_string();
+
+            updatetime = match mode {
+                "tassadar" => cpe["popUpdateTime"]
+                    .as_str()
+                    .unwrap_or_default()
+                    .to_string(),
+                _ => cpe["entryUpdateTime"]
+                    .as_str()
+                    .unwrap_or_default()
+                    .to_string(),
+            };
+
+            match mode {
+                "valor" | "tassadar" => {
+                    mastercpeip = cpe["masterPopIp"].as_str().unwrap_or_default().to_string();
+                    backupcpeip = cpe["backupPopIp"].as_str().unwrap_or_default().to_string();
+                    mid = cpe["masterPopId"].as_i64().unwrap_or(0);
+                    bid = cpe["backupPopId"].as_i64().unwrap_or(0);
                 }
-                if let Value::String(m) = &cpe["model"] {
-                    model = m.to_string();
-                }
-                if let Value::String(v) = &cpe["softwareVersion"] {
-                    version = v.to_string();
-                }
-                 if let Value::String(a) = &cpe["alias"] {
-                    alias = a.to_string();
-                }
-                //updatetime
-                match mode {
-                    "tassadar" => {
-                        if let Value::String(t) = &cpe["popUpdateTime"] {
-                            updatetime = t.to_string();
-                        }
-                    }
-                    _ => {
-                        if let Value::String(t) = &cpe["entryUpdateTime"] {
-                            updatetime = t.to_string();
-                        }
-                    }
-                }
-                // master/backup
-                match mode {
-                    "valor" | "tassadar" => {
-                        if let Value::String(m) = &cpe["masterPopIp"] {
-                            mastercpeip = m.to_string();
-                        }
-                        if let Value::String(b) = &cpe["backupPopIp"] {
-                            backupcpeip = b.to_string();
-                        }
-                        if let Value::Number(id) = &cpe["masterPopId"] {
-                            mid = id.as_i64().unwrap();
-                        }
-                        if let Value::Number(id) = &cpe["backupPopId"] {
-                            bid = id.as_i64().unwrap();
-                        }
-                    }
-                    _ => {
-                        if let Value::String(m) = &cpe["masterEntryIp"] {
-                            mastercpeip = m.to_string();
-                        }
-                        if let Value::String(b) = &cpe["backupEntryIp"] {
-                            backupcpeip = b.to_string();
-                        }
-                        if let Value::Number(id) = &cpe["masterEntryId"] {
-                            mid = id.as_i64().unwrap();
-                        }
-                        if let Value::Number(id) = &cpe["backupEntryId"] {
-                            bid = id.as_i64().unwrap();
-                        }
-                    }
+                _ => {
+                    mastercpeip = cpe["masterEntryIp"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_string();
+                    backupcpeip = cpe["backupEntryIp"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_string();
+                    mid = cpe["masterEntryId"].as_i64().unwrap_or(0);
+                    bid = cpe["backupEntryId"].as_i64().unwrap_or(0);
                 }
             }
         }
 
-        for device in &DVES {
-            if device["sn"] == *cpesn {
-                if let Value::Number(p) = &device["serverPort"] {
-                    port = p.to_string();
-                    //break;
-                }
-                match mode {
-                    "watsons" => {
-                         enterprise = "watsons".to_string();
-                    }
-                    "watsonsha" => {
-                         enterprise = "watsonsha".to_string();
-                    }
-                    _ => {
-                        if let Value::String(d) = &device["customer"]["name"] {
-                            enterprise = d.to_string();
-                        }
-                    }
-                }
+        // ---- 查找 DVE ----
+        if let Some(device) = dves.iter().find(|d| d["sn"].as_str() == Some(sn_filter)) {
+            if let Some(p) = device["serverPort"].as_i64() {
+                port = p.to_string();
             }
-        }
-        match mode {
-            "valor" => {
-                for pop in &POPS {
-                    if pop["id"] == mid {
-                        if let Value::String(m) = &pop["popIp"] {
-                            masterpopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-                for pop in &POPS {
-                    if pop["id"] == bid {
-                        if let Value::String(m) = &pop["popIp"] {
-                            backuppopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-            }
-            _ => {
-                for pop in &POPS {
-                    if pop["id"] == mid {
-                        if let Value::String(m) = &pop["entryIp"] {
-                            masterpopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-                for pop in &POPS {
-                    if pop["id"] == bid {
-                        if let Value::String(m) = &pop["entryIp"] {
-                            backuppopip = m.to_string();
-                            break;
-                        }
-                    }
-                }
-            }
+
+            enterprise = match mode {
+                "watsons" => "watsons".to_string(),
+                "watsonsha" => "watsonsha".to_string(),
+                _ => device["customer"]["name"]
+                    .as_str()
+                    .unwrap_or_default()
+                    .to_string(),
+            };
         }
 
-        let uu = Ucpe {
+        // ---- 查找 POP ----
+        if let Some(pop) = pop_map.get(&mid) {
+            masterpopip = match mode {
+                "valor" => pop["popIp"].as_str().unwrap_or_default().to_string(),
+                _ => pop["entryIp"].as_str().unwrap_or_default().to_string(),
+            };
+        }
+        if let Some(pop) = pop_map.get(&bid) {
+            backuppopip = match mode {
+                "valor" => pop["popIp"].as_str().unwrap_or_default().to_string(),
+                _ => pop["entryIp"].as_str().unwrap_or_default().to_string(),
+            };
+        }
+
+        // ---- 组装 Ucpe ----
+        let ucpe = Ucpe {
             sn,
             model,
             version,
@@ -232,138 +201,95 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
             alias,
         };
 
-        ucpes.push(uu)
+        ucpes.push(ucpe);
     }
-    Some(ucpes.to_vec())
+
+    Some(ucpes)
 }
 
 pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
-    let mut mid = 0;
-    let mut bid = 0;
+    // 先找出目标 CPE
+    let cpe = get_cpes(mode)
+        .await?
+        .into_iter()
+        .find(|c| c["sn"].as_str() == Some(cpesn))?;
 
-    let mut cpe = Value::Null;
+    let sn = cpe["sn"].as_str().unwrap_or_default().to_string();
+    let model = cpe["model"].as_str().unwrap_or_default().to_string();
+    let version = cpe["softwareVersion"]
+        .as_str()
+        .unwrap_or_default()
+        .to_string();
+    let alias = cpe["alias"].as_str().unwrap_or_default().to_string();
 
-    let mut sn = String::new();
-    let mut model = String::new();
-    let mut version = String::new();
-    let mut port = String::new();
-    let mut enterprise = String::new();
-    let mut alias = String::new();
+    let updatetime = match mode {
+        "tassadar" => cpe["popUpdateTime"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string(),
+        _ => cpe["entryUpdateTime"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string(),
+    };
 
+    let (mut mid, mut bid) = (0, 0);
+    let (mut mastercpeip, mut backupcpeip) = (String::new(), String::new());
 
-    let mut updatetime  = String::new();
-    let mut masterpopip = String::new();
-    let mut mastercpeip = String::new();
-    let mut backuppopip = String::new();
-    let mut backupcpeip = String::new();
-
-    if let Some(values) = get_cpes(mode).await {
-        for value in values {
-            if cpesn == value["sn"] {
-                cpe = value
-            }
-        }
-    }
-    if let Value::String(s) = &cpe["sn"] {
-        sn = s.to_string();
-    }
-    if let Value::String(m) = &cpe["model"] {
-        model = m.to_string();
-    }
-    if let Value::String(v) = &cpe["softwareVersion"] {
-        version = v.to_string();
-    }
-    if let Value::String(a) = &cpe["alias"] {
-        alias = a.to_string();
-    }
-    //updatetime
-    match mode {
-        "tassadar" => {
-            if let Value::String(t) = &cpe["popUpdateTime"] {
-                updatetime = t.to_string();
-            }
-        }
-        _ => {
-            if let Value::String(t) = &cpe["entryUpdateTime"] {
-                updatetime = t.to_string();
-            }
-        }
-    }
-    // master/backup
     match mode {
         "valor" | "tassadar" => {
-            if let Value::String(m) = &cpe["masterPopIp"] {
-                mastercpeip = m.to_string();
-            }
-            if let Value::String(b) = &cpe["backupPopIp"] {
-                backupcpeip = b.to_string();
-            }
-            if let Value::Number(id) = &cpe["masterPopId"] {
-                mid = id.as_i64().unwrap();
-            }
-            if let Value::Number(id) = &cpe["backupPopId"] {
-                bid = id.as_i64().unwrap();
-            }
+            mastercpeip = cpe["masterPopIp"].as_str().unwrap_or_default().to_string();
+            backupcpeip = cpe["backupPopIp"].as_str().unwrap_or_default().to_string();
+            mid = cpe["masterPopId"].as_i64().unwrap_or(0);
+            bid = cpe["backupPopId"].as_i64().unwrap_or(0);
         }
         _ => {
-            if let Value::String(m) = &cpe["masterEntryIp"] {
-                mastercpeip = m.to_string();
-            }
-            if let Value::String(b) = &cpe["backupEntryIp"] {
-                backupcpeip = b.to_string();
-            }
-            if let Value::Number(id) = &cpe["masterEntryId"] {
-                mid = id.as_i64().unwrap();
-            }
-            if let Value::Number(id) = &cpe["backupEntryId"] {
-                bid = id.as_i64().unwrap();
-            }
+            mastercpeip = cpe["masterEntryIp"]
+                .as_str()
+                .unwrap_or_default()
+                .to_string();
+            backupcpeip = cpe["backupEntryIp"]
+                .as_str()
+                .unwrap_or_default()
+                .to_string();
+            mid = cpe["masterEntryId"].as_i64().unwrap_or(0);
+            bid = cpe["backupEntryId"].as_i64().unwrap_or(0);
         }
     }
 
-    match mode {
-        "valor" => {
-            if let Some(p) = get_pop(mode, mid).await {
-                if let Value::String(m) = &p["popIp"] {
-                    masterpopip = m.to_string();
-                }
-            }
-            if let Some(p) = get_pop(mode, bid).await {
-                if let Value::String(b) = &p["popIp"] {
-                    backuppopip = b.to_string();
-                }
-            }
-        }
-        _ => {
-            if let Some(p) = get_pop(mode, mid).await {
-                if let Value::String(m) = &p["entryIp"] {
-                    masterpopip = m.to_string();
-                }
-            }
-            if let Some(p) = get_pop(mode, bid).await {
-                if let Value::String(b) = &p["entryIp"] {
-                    backuppopip = b.to_string();
-                }
-            }
-        }
+    // 查 POP
+    let mut masterpopip = String::new();
+    let mut backuppopip = String::new();
+
+    if let Some(p) = get_pop(mode, mid).await {
+        masterpopip = match mode {
+            "valor" => p["popIp"].as_str().unwrap_or_default().to_string(),
+            _ => p["entryIp"].as_str().unwrap_or_default().to_string(),
+        };
     }
+    if let Some(p) = get_pop(mode, bid).await {
+        backuppopip = match mode {
+            "valor" => p["popIp"].as_str().unwrap_or_default().to_string(),
+            _ => p["entryIp"].as_str().unwrap_or_default().to_string(),
+        };
+    }
+
+    // 查 DVE
+    let mut port = String::new();
+    let mut enterprise = String::new();
+
     if let Some(device) = get_dve(mode, cpesn).await {
-        if let Value::Number(p) = &device["serverPort"] {
+        if let Some(p) = device["serverPort"].as_i64() {
             port = p.to_string();
         }
-        match mode {
-            "watsons" => {
-                enterprise = "watsons".to_string();
-            }
-            "watsonsha" => {
-                enterprise = "watsonsha".to_string();
-            }
-            _ => {
-                if let Value::String(d) = &device["customer"]["name"] {
-                    enterprise = d.to_string();
-                }
-           }
-       }
+        enterprise = match mode {
+            "watsons" => "watsons".to_string(),
+            "watsonsha" => "watsonsha".to_string(),
+            _ => device["customer"]["name"]
+                .as_str()
+                .unwrap_or_default()
+                .to_string(),
+        };
     }
 
     Some(Ucpe {

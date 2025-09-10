@@ -7,6 +7,7 @@ trap {
 } WINCH
 
 
+
 set node_ip  [lindex $argv 0]
 set cpe_ip   [lindex $argv 1]
 set username [lindex $argv 2]
@@ -92,4 +93,3 @@ if {$mode != "ucpe"} {
     interact
 }
 # expect eof
-
