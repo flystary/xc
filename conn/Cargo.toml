@@ -1,0 +1,9 @@
+[package]
+name = "conn"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+openssh = "0.6.x"
+anyhow = "1.0"
