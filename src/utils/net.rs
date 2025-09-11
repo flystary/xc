@@ -4,7 +4,6 @@ use std::collections::HashMap;
 
 use once_cell::sync::Lazy;
 use tokio::sync::RwLock;
-use tokio::task;
 
 use super::init::init_conf;
 use super::ucpe::Ucpe;
@@ -16,12 +15,10 @@ pub static POPS: Lazy<RwLock<Vec<Value>>> = Lazy::new(|| RwLock::new(Vec::new())
 pub static DVES: Lazy<RwLock<Vec<Value>>> = Lazy::new(|| RwLock::new(Vec::new()));
 
 async fn handle(mode: &str) {
-    let (cpes, pops, dves, _) = tokio::join!(
-        get_cpes(mode),
-        get_pops(mode),
-        get_dves(mode),
-        task::spawn_blocking(|| super::init::init_token())
-    );
+    // 确保先初始化 token
+    super::init::init_token().await;
+
+    let (cpes, pops, dves) = tokio::join!(get_cpes(mode), get_pops(mode), get_dves(mode),);
 
     if let Some(data) = cpes {
         *CPES.write().await = data;
@@ -61,21 +58,6 @@ pub async fn get_token_by_resp() -> Option<String> {
             .and_then(|v| v.as_str())
             .map(|s| s.to_string())
     })
-}
-
-/// 获取 CPES 的只读副本
-pub async fn get_cpes_data() -> Vec<Value> {
-    CPES.read().await.clone()
-}
-
-/// 获取 POPS 的只读副本
-pub async fn get_pops_data() -> Vec<Value> {
-    POPS.read().await.clone()
-}
-
-/// 获取 DVES 的只读副本
-pub async fn get_dves_data() -> Vec<Value> {
-    DVES.read().await.clone()
 }
 
 /// 根据 SN 列表和 mode 获取 Ucpes
