@@ -12,7 +12,7 @@ pub async fn get_cpe_text(base: String) -> String {
     let url = format!(
         "{}access_token={}&_={}",
         base,
-        super::init::get_token(),
+        super::init::get_token().await,
         super::tools::get_unixtime(),
     );
     reqwest::get(url.as_str())

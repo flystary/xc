@@ -16,7 +16,7 @@ pub static DVES: Lazy<RwLock<Vec<Value>>> = Lazy::new(|| RwLock::new(Vec::new())
 
 async fn handle(mode: &str) {
     // 确保先初始化 token
-    super::init::init_token().await;
+    super::init::get_token().await;
 
     let (cpes, pops, dves) = tokio::join!(get_cpes(mode), get_pops(mode), get_dves(mode),);
 
@@ -190,11 +190,11 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
 }
 
 pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
-    // 先找出目标 CPE
-    let cpe = get_cpes(mode)
-        .await?
-        .into_iter()
-        .find(|c| c["sn"].as_str() == Some(cpesn))?;
+    // 获取所有 CPE
+    let cpes = get_cpes(mode).await?;
+
+    // 找到对应 SN
+    let cpe = cpes.into_iter().find(|c| c["sn"].as_str() == Some(cpesn))?;
 
     let sn = cpe["sn"].as_str().unwrap_or_default().to_string();
     let model = cpe["model"].as_str().unwrap_or_default().to_string();
@@ -215,59 +215,63 @@ pub async fn get_cpe_by_sn_and_mode(cpesn: &str, mode: &str) -> Option<Ucpe> {
             .to_string(),
     };
 
-    let (mut mid, mut bid) = (0, 0);
-    let (mut mastercpeip, mut backupcpeip) = (String::new(), String::new());
-
-    match mode {
-        "valor" | "tassadar" => {
-            mastercpeip = cpe["masterPopIp"].as_str().unwrap_or_default().to_string();
-            backupcpeip = cpe["backupPopIp"].as_str().unwrap_or_default().to_string();
-            mid = cpe["masterPopId"].as_i64().unwrap_or(0);
-            bid = cpe["backupPopId"].as_i64().unwrap_or(0);
-        }
-        _ => {
-            mastercpeip = cpe["masterEntryIp"]
+    // master / backup IP 和 ID
+    let (mid, bid, mastercpeip, backupcpeip) = match mode {
+        "valor" | "tassadar" => (
+            cpe["masterPopId"].as_i64().unwrap_or(0),
+            cpe["backupPopId"].as_i64().unwrap_or(0),
+            cpe["masterPopIp"].as_str().unwrap_or_default().to_string(),
+            cpe["backupPopIp"].as_str().unwrap_or_default().to_string(),
+        ),
+        _ => (
+            cpe["masterEntryId"].as_i64().unwrap_or(0),
+            cpe["backupEntryId"].as_i64().unwrap_or(0),
+            cpe["masterEntryIp"]
                 .as_str()
                 .unwrap_or_default()
-                .to_string();
-            backupcpeip = cpe["backupEntryIp"]
+                .to_string(),
+            cpe["backupEntryIp"]
                 .as_str()
                 .unwrap_or_default()
-                .to_string();
-            mid = cpe["masterEntryId"].as_i64().unwrap_or(0);
-            bid = cpe["backupEntryId"].as_i64().unwrap_or(0);
-        }
-    }
+                .to_string(),
+        ),
+    };
 
-    // 查 POP
-    let mut masterpopip = String::new();
-    let mut backuppopip = String::new();
+    // 并发获取 POP
+    let (master_pop, backup_pop) = tokio::join!(get_pop(mode, mid), get_pop(mode, bid));
 
-    if let Some(p) = get_pop(mode, mid).await {
-        masterpopip = match mode {
-            "valor" => p["popIp"].as_str().unwrap_or_default().to_string(),
-            _ => p["entryIp"].as_str().unwrap_or_default().to_string(),
-        };
-    }
-    if let Some(p) = get_pop(mode, bid).await {
-        backuppopip = match mode {
-            "valor" => p["popIp"].as_str().unwrap_or_default().to_string(),
-            _ => p["entryIp"].as_str().unwrap_or_default().to_string(),
-        };
-    }
+    let masterpopip = master_pop
+        .map(|p| {
+            if mode == "valor" {
+                p["popIp"].as_str().unwrap_or_default().to_string()
+            } else {
+                p["entryIp"].as_str().unwrap_or_default().to_string()
+            }
+        })
+        .unwrap_or_default();
 
-    // 查 DVE
+    let backuppopip = backup_pop
+        .map(|p| {
+            if mode == "valor" {
+                p["popIp"].as_str().unwrap_or_default().to_string()
+            } else {
+                p["entryIp"].as_str().unwrap_or_default().to_string()
+            }
+        })
+        .unwrap_or_default();
+
+    // 获取 DVE
+    let device = get_dve(mode, cpesn).await;
     let mut port = String::new();
     let mut enterprise = String::new();
-
-    if let Some(device) = get_dve(mode, cpesn).await {
-        if let Some(p) = device["serverPort"].as_i64() {
+    if let Some(d) = device {
+        if let Some(p) = d["serverPort"].as_i64() {
             port = p.to_string();
         }
         enterprise = match mode {
             "watsons" => "watsons".to_string(),
             "watsonsha" => "watsonsha".to_string(),
-            _ => device["customer"]["name"]
+            _ => d["customer"]["name"]
                 .as_str()
                 .unwrap_or_default()
                 .to_string(),
