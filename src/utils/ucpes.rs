@@ -13,7 +13,13 @@ pub trait Dis {
 
 impl Dis for Ucpes {
     fn display(&self) {
-        let table = Table::new(self)
+        if self.is_empty() {
+            println!("No data availabes.".red());
+            return;
+        }
+
+        let table = Table::new(self);
+        table
             //.with(Style::GITHUB_MARKDOWN)
             //.with(Style::noborder())
             .with(Style::NO_BORDER)

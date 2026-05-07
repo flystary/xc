@@ -1,32 +1,32 @@
-extern crate colored;
-extern crate tabled;
 use colored::*;
+use std::process::{Command, ExitStatus};
+use tabled::{settings::Style, Table, Tabled};
 
-use std::process::Command;
-use tabled::{Alignment, Format, Full, Head, Indent, Modify, Row};
-use tabled::{Style, Table, Tabled};
+// 定义脚本常量，方便后期维护
+const CONNECT_SCRIPT: &str = "/etc/xc/bin/connet";
+const EXPECT_BIN: &str = "/usr/bin/expect";
 
 #[derive(Tabled, Clone)]
 pub struct Ucpe {
-    pub(crate) sn: String,
-    pub(crate) model: String,
-    pub(crate) version: String,
-    pub(crate) updatetime: String,
-    pub(crate) masterpopip: String,
-    pub(crate) mastercpeip: String,
-    pub(crate) backuppopip: String,
-    pub(crate) backupcpeip: String,
-    pub(crate) port:        String,
-    pub(crate) enterprise:  String,
-    pub(crate) alias:       String,
+    pub sn: String,
+    pub model: String,
+    pub version: String,
+    pub updatetime: String,
+    pub masterpopip: String,
+    pub mastercpeip: String,
+    pub backuppopip: String,
+    pub backupcpeip: String,
+    pub port: String,
+    pub enterprise: String,
+    pub alias: String,
 }
 
 pub trait Dis {
     fn display(&self);
 }
 
-impl Dis for Ucpe {
-    fn display(&self) {
+impl Ucpe {
+    pub fn display(&self) {
         // let v = vec![self];
         let table = Table::new(vec![self])
             //.with(Style::GITHUB_MARKDOWN)
@@ -68,77 +68,55 @@ impl Con for Ucpe {
         true
     }
     fn conn_master(&self) {
-        let conf = super::init::init_conf();
-        if self.mastercpeip.as_str() == "0.0.0.0" || self.masterpopip.as_str() == "0.0.0.0" {
-            println!("{}", "CPE Master pop or cpe is 0.0.0.0".red().bold());
-            return;
-        }
-        if self.mastercpeip.is_empty() || self.masterpopip.is_empty() {
-            println!("{}", "CPE Master pop or cpe is None".red().bold());
-            return;
-        }
-        if conf.jump.username.is_empty() || conf.jump.password.is_empty() {
-            println!("{}", "LOGIN CPE Username or password is None".red().bold());
-            return;
-        }
-        if cfg!(target_os = "linux") {
-            if self.model.as_str() == "7XEC2000-260" || self.model.as_str() == "7XEC2000-100" {
-                Command::new("/usr/bin/expect")
-                    .arg("/etc/xc/bin/connet")
-                    .arg(&self.masterpopip)
-                    .arg(&self.mastercpeip)
-                    .arg(&conf.jump.username)
-                    .arg(&conf.jump.password)
-                    .arg("ucpe")
-                    .status()
-                    .expect("登录失败!");
-                return;
-            }
-            Command::new("/usr/bin/expect")
-                .arg("/etc/xc/bin/connet")
-                .arg(&self.masterpopip)
-                .arg(&self.mastercpeip)
-                .arg(&conf.jump.username)
-                .arg(&conf.jump.password)
-                .status()
-                .expect("登录失败!");
-        };
+        self.perform_connect(&self.masterpopip, &self.mastercpeip, "Master");
     }
+
     fn conn_backup(&self) {
+        self.perform_connect(&self.backuppopip, &self.backupcpeip, "Backup");
+    }
+}
+
+impl Ucpe {
+    fn perform_connect(&self, pop_ip: &str, cpe_ip: &str, label: &str) {
         let conf = super::init::init_conf();
-        if self.backupcpeip.as_str() == "0.0.0.0" || self.backuppopip.as_str() == "0.0.0.0" {
-            println!("{}", "CPE Backup pop or cpe is 0.0.0.0".red().bold());
+
+        if pop_ip == "0.0.0.0" || cpe_ip == "0.0.0.0" {
+            eprintln!("{}", format!("Error: {} IP is 0.0.0.0", label).red().bold());
             return;
         }
-        if self.backupcpeip.is_empty() || self.backuppopip.is_empty() {
-            println!("{}", "CPE Backup pop or cpe is None".red().bold());
+
+        if pop_ip.is_empty() || cpe_ip.is_empty() || conf.jump.username.is_empty() {
+            eprintln!(
+                "{}",
+                format!("Error: {} info or credentials missing", label)
+                    .red()
+                    .bold()
+            );
             return;
         }
-        if conf.jump.username.is_empty() || conf.jump.password.is_empty() {
-            println!("{}", "LOGIN CPE Username or password is None".red().bold());
-            return;
-        }
+
         if cfg!(target_os = "linux") {
-            if self.model.as_str() == "7XEC2000-260" || self.model.as_str() == "7XEC2000-100" {
-                Command::new("/usr/bin/expect")
-                    .arg("/etc/xc/bin/connet")
-                    .arg(&self.backuppopip)
-                    .arg(&self.backupcpeip)
-                    .arg(&conf.jump.username)
-                    .arg(&conf.jump.password)
-                    .arg("ucpe")
-                    .status()
-                    .expect("登录失败!");
-                return;
+            let mut cmd = Command::new(EXPECT_BIN);
+            cmd.arg(CONNECT_SCRIPT)
+                .arg(pop_ip)
+                .arg(cpe_ip)
+                .arg(&conf.jump.username)
+                .arg(&conf.jump.password);
+
+            if matches!(self.model.as_str(), "7XEC2000-260" | "7XEC2000-100") {
+                cmd.arg("ucpe");
             }
-            Command::new("/usr/bin/expect")
-                .arg("/etc/xc/bin/connet")
-                .arg(&self.backuppopip)
-                .arg(&self.backupcpeip)
-                .arg(conf.jump.username)
-                .arg(conf.jump.password)
-                .status()
-                .expect("登录失败!");
+
+            match cmd.status() {
+                Ok(status) if status.success() => println!("{} login successful.", label),
+                Ok(status) => eprintln!("{}", format!("{} login failed: {}", label, status).red()),
+                Err(e) => eprintln!("{}", format!("Failed to execute expect: {}", e).red()),
+            }
+        } else {
+            println!(
+                "{}",
+                "Warning: Connection logic only supports Linux.".yellow()
+            );
         }
     }
 }

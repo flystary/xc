@@ -5,54 +5,29 @@ use std::fs::File;
 use std::io::prelude::*;
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct FullService {
+    pub cpe: String,
+    pub pop: String,
+    pub dve: String,
+    pub pse: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Route {
     pub url: String,
     pub token: String,
     pub operation: String,
-    modes: Vec<String>,
-    valor: Valor,
-    tassadar: Tassadar,
-    nexus: Nexus,
-    watsons: Watsons,
-    watsonsha: WatsonsHa,
-}
-#[derive(Debug, Serialize, Deserialize)]
-struct Valor {
-    cpe: String,
-    pop: String,
-    dve: String,
-    pse: String,
-}
-#[derive(Debug, Serialize, Deserialize)]
-struct Tassadar {
-    pop: String,
-    cpe: String,
-    dve: String,
-}
-#[derive(Debug, Serialize, Deserialize)]
-struct Watsons {
-    pop: String,
-    cpe: String,
-    dve: String,
-    pse: String,
-}
-#[warn(non_camel_case_types)]
-#[derive(Debug, Serialize, Deserialize)]
-struct WatsonsHa {
-    cpe: String,
-    pop: String,
-    dve: String,
-    pse: String,
-}
-#[derive(Debug, Serialize, Deserialize)]
-struct Nexus {
-    pop: String,
-    cpe: String,
-    dve: String,
+    pub modes: Vec<String>,
+    pub valor: FullService,
+    pub tassadar: FullService,
+    pub nexus: FullService,
+    pub watsons: FullService,
+    #[serde(rename = "watsonsha")] // 映射 YAML 中的字段名
+    pub watsons_ha: FullService,
 }
 
 impl Route {
-    pub fn get_cpe_route(self, mode: &str) -> Option<String> {
+    pub fn get_cpe_route(&self, mode: &str) -> Option<String> {
         match mode {
             "valor" => Some(format!(
                 "{}/valor/{}?page=1&pageSize={}&",
@@ -98,15 +73,11 @@ impl Route {
     }
 }
 
-pub fn load_route(path: String) -> Route {
-    let mut file = match File::open(&path) {
-        Ok(f) => f,
-        Err(e) => panic!("no such file {} exception:{}", path, e),
-    };
-    let mut str = String::new();
-    match file.read_to_string(&mut str) {
-        Ok(s) => s,
-        Err(e) => panic!("Error Reading file: {}", e),
-    };
-    serde_yaml::from_str(&str).unwrap()
+pub fn load_route<P: AsRef<Path>>(path: P) -> Route {
+    let file = File::open(path).unwrap_or_else(|e| {
+        panic!("no open file: {:?}", e);
+    });
+
+    // 直接从 Reader 反序列化，效率更高
+    serde_yaml::from_reader(file).expect("YAML 格式错误")
 }
