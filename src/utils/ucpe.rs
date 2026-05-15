@@ -40,7 +40,7 @@ impl Dis for Ucpe {
     }
 }
 
-pub trait Con {
+pub trait Conn {
     fn check_master(&self) -> bool;
     fn check_backup(&self) -> bool;
     fn conn_master(&self);
@@ -51,7 +51,7 @@ pub trait Con {
     // fn conn_report(&self);
 }
 
-impl Con for Ucpe {
+impl Conn for Ucpe {
     fn check_master(&self) -> bool {
         if self.mastercpeip.is_empty() && self.masterpopip.is_empty() {
             return false;

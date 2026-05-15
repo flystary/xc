@@ -1,7 +1,7 @@
 extern crate colored;
 use crate::utils::{
     net::get_cpe_by_sn_and_mode,
-    ucpe::{Con, Dis},
+    ucpe::{Conn, Dis},
 };
 use clap::{App, Arg, ArgMatches, SubCommand};
 use colored::*;
