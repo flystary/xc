@@ -18,9 +18,9 @@ async fn run() {
     match matches.subcommand() {
         //cmd
         ("conn", Some(ucpe)) => cmd::conn::run(ucpe).await,
-        ("show", Some(ucpe)) => cmd::show::run(ucpe).await,
-        ("list", Some(ucpe)) => cmd::list::run(ucpe).await,
         ("exec", Some(ucpe)) => cmd::exec::run(ucpe).await,
+        ("list", Some(ucpe)) => cmd::list::run(ucpe).await,
+        ("show", Some(ucpe)) => cmd::show::run(ucpe).await,
         _ => eprintln!("No subcommand chosen. use --help | -h to view the subcommands."),
     }
 }

@@ -2,7 +2,6 @@ use colored::*;
 use std::process::{Command, ExitStatus};
 use tabled::{settings::Style, Table, Tabled};
 
-// 定义脚本常量，方便后期维护
 const CONNECT_SCRIPT: &str = "/etc/xc/bin/connet";
 const EXPECT_BIN: &str = "/usr/bin/expect";
 
