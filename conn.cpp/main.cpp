@@ -9,7 +9,7 @@
 #include <condition_variable>
 #include <cstdlib>
 
-// ----------------- 会话结构体 -----------------
+// 会话结构体
 struct Session
 {
     int spawn_id;
@@ -25,7 +25,7 @@ struct Session
         : spawn_id(0), node_ip(n), cpe_ip(c), active(true) {}
 };
 
-// ----------------- 工具函数 -----------------
+// 工具函数
 void send_and_expect(int spawn_id, const std::string &send_str, const std::vector<std::string> &expects)
 {
     exp_send(spawn_id, (char *)send_str.c_str());
@@ -37,7 +37,7 @@ void send_and_expect(int spawn_id, const std::string &send_str, const std::vecto
     }
 }
 
-// ----------------- 登录跳板机 -----------------
+// 登录跳板机
 bool login_jump(Session *session, const std::string &username,
                 const std::string &password, const std::string &root_pwd)
 {
@@ -55,7 +55,7 @@ bool login_jump(Session *session, const std::string &username,
     return true;
 }
 
-// ----------------- SSH 到 CPE -----------------
+// SSH 到 CPE
 bool ssh_to_cpe(Session *session, const std::string &mode, const std::string &root_pwd, const std::string &o_pwd)
 {
     char ssh_cmd[512];
@@ -79,7 +79,7 @@ bool ssh_to_cpe(Session *session, const std::string &mode, const std::string &ro
     return true;
 }
 
-// ----------------- 会话线程函数 -----------------
+// 会话线程函数
 void session_thread(Session *session,
                     const std::string &username,
                     const std::string &password,
@@ -114,7 +114,7 @@ void session_thread(Session *session,
     exp_close(session->spawn_id);
 }
 
-// ----------------- 主函数 -----------------
+// 主函数
 int main()
 {
     const char *username = std::getenv("SSH_USER");

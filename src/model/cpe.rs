@@ -63,7 +63,7 @@ pub trait CpeCollectionExt<T: CpeInfo> {
     fn to_sn_map(&self) -> HashMap<&str, &T>;
 }
 
-// 3. 特征的通用纯净实现
+// 特征的通用纯净实现
 impl<T: CpeInfo> CpeCollectionExt<T> for [T] {
     #[inline]
     fn get_by_sn(&self, sn: &str) -> Option<&T> {
@@ -101,7 +101,7 @@ impl<T: CpeInfo> CpeCollectionExt<T> for [T] {
             .to_string()
     }
 
-    // 🚀 核心通用闭包过滤器（纯零成本抽象实现）
+    // 核心通用闭包过滤器（纯零成本抽象实现）
     #[inline]
     fn filter_sns<F>(&self, predicate: F) -> Vec<String>
     where

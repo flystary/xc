@@ -5,7 +5,7 @@ use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // ---------- 获取命令行参数 ----------
+    //  获取命令行参数
     let args: Vec<String> = env::args().collect();
     if args.len() != 7 {
         eprintln!(
@@ -25,7 +25,7 @@ async fn main() -> Result<()> {
 
     let x_pwd = "ROOTPWD"; // root 密码
 
-    // ---------- 1. 登录跳板机 ----------
+    // 登录跳板机
     let jump_session = SessionBuilder::default()
         .user(username.clone())
         .password(password.clone()) // 低版本 openssh 支持 password()
@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
 
     println!("✅ Logged into jump host");
 
-    // ---------- 2. 切换节点 root ----------
+    // 切换节点 root
     let mut jump_shell = jump_session.shell().await?;
     jump_shell
         .write_all(format!("{}\n", node_ip).as_bytes())
@@ -47,7 +47,7 @@ async fn main() -> Result<()> {
     jump_shell.flush().await?;
     println!("✅ Switched to node root");
 
-    // ---------- 3. SSH 到目标 CPE ----------
+    // SSH 到目标 CPE
     let cpe_user = if mode == "ucpe" {
         "root".to_string()
     } else {
@@ -76,13 +76,13 @@ async fn main() -> Result<()> {
         }
     }
 
-    // ---------- 4. 执行动态命令 ----------
+    // 执行动态命令
     if let Some(mut stdin) = cpe_session.stdin().take() {
         stdin.write_all(format!("{}\n", command).as_bytes()).await?;
         stdin.flush().await?;
     }
 
-    // ---------- 5. 交互模式 ----------
+    // 交互模式
     println!("✅ Entering interactive mode. Press Ctrl+D to exit.");
 
     let mut stdin = cpe_session.stdin().take().unwrap();

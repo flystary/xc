@@ -7,14 +7,14 @@ trap {
     stty rows $rows columns $cols < $spawn_out(slave,name)
 } WINCH
 
-# ---------- 参数 ----------
+#  参数 
 set node_ip  [lindex $argv 0]
 set cpe_ip   [lindex $argv 1]
 set username [lindex $argv 2]
 set password [lindex $argv 3]
 set mode     [lindex $argv 4]
 
-# ---------- 密码 ----------
+#  密码 
 set O_PWD OnM
 set X_PWD XnM
 set timeout 5

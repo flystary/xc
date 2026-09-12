@@ -95,7 +95,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
         let mut mid: i64 = 0;
         let mut bid: i64 = 0;
 
-        // ---- 查找 CPE ----
+        // 查找 CPE
         if let Some(cpe) = cpes.iter().find(|c| c["sn"].as_str() == Some(sn_filter)) {
             sn = cpe["sn"].as_str().unwrap_or_default().to_string();
             model = cpe["model"].as_str().unwrap_or_default().to_string();
@@ -138,7 +138,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
             }
         }
 
-        // ---- 查找 DVE ----
+        // 查找 DVE
         if let Some(device) = dves.iter().find(|d| d["sn"].as_str() == Some(sn_filter)) {
             if let Some(p) = device["serverPort"].as_i64() {
                 port = p.to_string();
@@ -154,7 +154,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
             };
         }
 
-        // ---- 查找 POP ----
+        // 查找 POP
         if let Some(pop) = pop_map.get(&mid) {
             masterpopip = match mode {
                 "valor" => pop["popIp"].as_str().unwrap_or_default().to_string(),
@@ -168,7 +168,7 @@ pub async fn get_cpes_by_sn_mode(mode: &str, cpesns: Vec<&str>) -> Option<Ucpes>
             };
         }
 
-        // ---- 组装 Ucpe ----
+        // 组装 Ucpe
         let ucpe = Ucpe {
             sn,
             model,

@@ -35,7 +35,7 @@ func main() {
 		Timeout:         5 * time.Second,
 	}
 
-	// ---------- 1. 登录跳板机 ----------
+	// 登录跳板机
 	conn, err := ssh.Dial("tcp", "master.jump.7x-networks.net:2222", sshConfig)
 	if err != nil {
 		log.Fatal("Failed to dial jump host:", err)
@@ -65,7 +65,7 @@ func main() {
 	e.Send(xPwd + "\n")
 	e.Expect(regexp.MustCompile("root@.*~\\]#"), 5*time.Second)
 
-	// ---------- 2. SSH 到目标 CPE ----------
+	// SSH 到目标 CPE
 	var sshCmd string
 	if mode != "ucpe" {
 		sshCmd = fmt.Sprintf("ssh -i /etc/openvpn/server/box seven@%s -p 7722", cpeIP)
@@ -90,10 +90,10 @@ func main() {
 		e.Expect(regexp.MustCompile("#"), 5*time.Second)
 	}
 
-	// ---------- 3. 执行动态命令 ----------
+	// 执行动态命令
 	e.Send(command + "\n")
 
-	// ---------- 4. 交互模式，exit/quit退出 ----------
+	// 交互模式，exit/quit退出
 	fmt.Println("✅ Entering interactive mode. Type 'exit' or 'quit' to leave.")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {

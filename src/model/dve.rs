@@ -39,7 +39,7 @@ pub trait DveCollectionExt<T: DveInfo> {
     // 专属业务过滤器：根据企业/客户名称获取 SN 列表
     fn get_by_enterprise(&self, enterprise: &str) -> Vec<String>;
 
-    // 🚀 O(1) 哈希加速垫：快速构建基于 SN 的只读索引映射表
+    // 哈希加速垫：快速构建基于 SN 的只读索引映射表
     fn to_sn_map(&self) -> HashMap<&str, &T>;
 }
 
